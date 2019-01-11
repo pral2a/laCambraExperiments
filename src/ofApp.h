@@ -3,6 +3,7 @@
 #include "ofMain.h"
 #include "ofxOpenCv.h"
 #include "ofxKinect.h"
+#include "ofxVideoRecorder.h"
 
 // Windows users:
 // You MUST install the libfreenect kinect drivers in order to be able to use
@@ -64,4 +65,9 @@ public:
 	
 	// used for viewing the point cloud
 	ofEasyCam easyCam;
+    
+    ofxVideoRecorder vidRecorder;
+    bool bRecording;
+    void startRecord();
+    void stopRecord();
 };

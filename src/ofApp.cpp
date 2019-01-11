@@ -27,6 +27,7 @@ void ofApp::setup() {
 		ofLogNotice() << "zero plane pixel size: " << kinect.getZeroPlanePixelSize() << "mm";
 		ofLogNotice() << "zero plane dist: " << kinect.getZeroPlaneDistance() << "mm";
 	}
+    
 	
 #ifdef USE_TWO_KINECTS
 	kinect2.init();
@@ -50,6 +51,11 @@ void ofApp::setup() {
 	
 	// start from the front
 	bDrawPointCloud = false;
+    
+    vidRecorder.setFfmpegLocation(ofFilePath::getAbsolutePath("ASSETS/ffmpeg"));
+    
+    startRecord();
+    
 }
 
 //--------------------------------------------------------------
@@ -85,6 +91,9 @@ void ofApp::update() {
 					pix[i] = 0;
 				}
 			}
+            
+            vidRecorder.addFrame(pix);
+            
 		}
 		
 		// update the cv images
@@ -180,10 +189,30 @@ void ofApp::drawPointCloud() {
 void ofApp::exit() {
 	kinect.setCameraTiltAngle(0); // zero the tilt on exit
 	kinect.close();
-	
+    stopRecord();
 #ifdef USE_TWO_KINECTS
 	kinect2.close();
 #endif
+}
+
+//--------------------------------------------------------------
+
+void ofApp::startRecord() {
+    
+    bRecording = true;
+    
+    if(bRecording && !vidRecorder.isInitialized()) {
+        
+        vidRecorder.setup("your-file-name.mp4", 1024, 768, 30, 44100, 2);
+        
+    }
+    
+}
+
+void ofApp::stopRecord() {
+    bRecording = false;
+    vidRecorder.close();
+    
 }
 
 //--------------------------------------------------------------
@@ -305,3 +334,4 @@ void ofApp::windowResized(int w, int h)
 {
 
 }
+

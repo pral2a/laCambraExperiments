@@ -1,2 +1,4 @@
 ofxKinect
 ofxOpenCv
+ofxPoco
+ofxVideoRecorder
