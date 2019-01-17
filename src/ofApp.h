@@ -20,9 +20,6 @@
 //
 // No way around the Windows driver dance, sorry.
 
-// uncomment this to read from two kinects simultaneously
-//#define USE_TWO_KINECTS
-
 class ofApp : public ofBaseApp {
 public:
 	
@@ -31,6 +28,7 @@ public:
 	void draw();
 	void exit();
 	
+	void drawInstructions();
 	void drawPointCloud();
 	
 	void keyPressed(int key);
@@ -56,8 +54,8 @@ public:
 	ofxCvContourFinder contourFinder;
 	
 	bool bThreshWithOpenCV;
-	bool bDrawPointCloud;
-	
+	bool bControlsOverlay;
+
 	int nearThreshold;
 	int farThreshold;
 	
