@@ -30,6 +30,7 @@ public:
 	
 	void drawInstructions();
 	void drawPointCloud();
+	void drawFilm();
 	
 	void keyPressed(int key);
 	void mouseDragged(int x, int y, int button);
@@ -40,19 +41,7 @@ public:
 	void windowResized(int w, int h);
 	
 	ofxKinect kinect;
-	
-#ifdef USE_TWO_KINECTS
-	ofxKinect kinect2;
-#endif
-	
-	ofxCvColorImage colorImg;
-	
-	ofxCvGrayscaleImage grayImage; // grayscale depth image
-	ofxCvGrayscaleImage grayThreshNear; // the near thresholded image
-	ofxCvGrayscaleImage grayThreshFar; // the far thresholded image
-	
-	ofxCvContourFinder contourFinder;
-	
+		
 	bool bThreshWithOpenCV;
 	bool bControlsOverlay;
 
@@ -60,11 +49,18 @@ public:
 	int farThreshold;
 	
 	int angle;
+
+	long lastSavedFrame;
 	
 	// used for viewing the point cloud
 	ofEasyCam easyCam;
     
     ofxVideoRecorder vidRecorder;
+
+	ofFbo film;
+
+	ofPixels filmFrame;
+
     bool bRecording;
     void startRecord();
     void stopRecord();

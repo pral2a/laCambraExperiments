@@ -9,6 +9,14 @@
 void ofApp::setup() {
 	ofSetLogLevel(OF_LOG_VERBOSE);
 
+//	film.allocate(768, 768, GL_RGBA);
+
+	film.allocate(768, 768);
+
+	film.begin();
+    ofClear(255,255,255, 0);
+    film.end();
+
 	// enable depth->video image calibration
 	kinect.setRegistration(true);
 
@@ -26,14 +34,6 @@ void ofApp::setup() {
 		ofLogNotice() << "zero plane dist: " << kinect.getZeroPlaneDistance() << "mm";
 	}
 
-	colorImg.allocate(kinect.width, kinect.height);
-	grayImage.allocate(kinect.width, kinect.height);
-	grayThreshNear.allocate(kinect.width, kinect.height);
-	grayThreshFar.allocate(kinect.width, kinect.height);
-
-	nearThreshold = 230;
-	farThreshold = 70;
-	bThreshWithOpenCV = true;
 	bControlsOverlay = false;
 
 	ofSetFrameRate(60);
@@ -42,17 +42,16 @@ void ofApp::setup() {
 	angle = 0;
 	kinect.setCameraTiltAngle(angle);
 
-    vidRecorder.setFfmpegLocation(ofFilePath::getAbsolutePath("ASSETS/ffmpeg"));
+    vidRecorder.setFfmpegLocation(ofFilePath::getAbsolutePath("/usr/local/bin/ffmpeg"));
 
     startRecord();
+
+    lastSavedFrame = ofGetElapsedTimeMillis();
 
 }
 
 //--------------------------------------------------------------
 void ofApp::update() {
-
-	ofBackground(0, 0, 0);
-
 	kinect.update();
 
 	// there is a new frame and we are connected
@@ -64,10 +63,34 @@ void ofApp::update() {
 
 //--------------------------------------------------------------
 void ofApp::draw() {
+	ofBackground(0, 0, 0);
 
-	easyCam.begin();
-	drawPointCloud();
-	easyCam.end();
+	drawFilm();
+
+	// TODO: Testing video output. We'll test using static images instead.
+
+	if (ofGetElapsedTimeMillis() - lastSavedFrame > 1000) {
+
+
+		film.readToPixels(filmFrame);
+
+		bool success = vidRecorder.addFrame(filmFrame);
+
+	    if (!success) {
+	        ofLogWarning("This frame was not added!");
+	    } else {
+	    	ofLogWarning("Saved!");
+	    	lastSavedFrame = ofGetElapsedTimeMillis();
+	    }
+
+	    if (vidRecorder.hasVideoError()) {
+	        ofLogWarning("The video recorder failed to write some frames!");
+	    }
+
+
+	}
+
+	film.draw(0,0);
 
 	if(bControlsOverlay) {
 		drawInstructions();
@@ -100,6 +123,15 @@ void ofApp::drawPointCloud() {
 	ofPopMatrix();
 }
 
+void ofApp::drawFilm(){
+	film.begin();
+	ofBackground(0, 0, 0);
+	easyCam.begin();
+	drawPointCloud();
+	easyCam.end();
+	film.end();
+}
+
 //--------------------------------------------------------------
 void ofApp::exit() {
 	kinect.setCameraTiltAngle(0); // zero the tilt on exit
@@ -114,8 +146,10 @@ void ofApp::startRecord() {
     bRecording = true;
 
     if(bRecording && !vidRecorder.isInitialized()) {
-        vidRecorder.setup("your-file-name.mp4", 1024, 768, 30, 44100, 2);
+        vidRecorder.setup("laCambra.mp4", 768, 768, 30, 44100, 2);
     }
+
+    vidRecorder.start();
 
 }
 
@@ -131,34 +165,6 @@ void ofApp::keyPressed (int key) {
 		case 'q':
 			bControlsOverlay = !bControlsOverlay;
 			break;
-
-		case ' ':
-			bThreshWithOpenCV = !bThreshWithOpenCV;
-			break;
-
-		case '>':
-		case '.':
-			farThreshold ++;
-			if (farThreshold > 255) farThreshold = 255;
-			break;
-
-		case '<':
-		case ',':
-			farThreshold --;
-			if (farThreshold < 0) farThreshold = 0;
-			break;
-
-		case '+':
-		case '=':
-			nearThreshold ++;
-			if (nearThreshold > 255) nearThreshold = 255;
-			break;
-
-		case '-':
-			nearThreshold --;
-			if (nearThreshold < 0) nearThreshold = 0;
-			break;
-
 		case 'w':
 			kinect.enableDepthNearValueWhite(!kinect.isDepthNearValueWhite());
 			break;
@@ -228,9 +234,6 @@ void ofApp::drawInstructions() {
     }
 
 	reportStream << "press p to switch between images and point cloud, rotate the point cloud with the mouse" << endl
-	<< "using opencv threshold = " << bThreshWithOpenCV <<" (press spacebar)" << endl
-	<< "set near threshold " << nearThreshold << " (press: + -)" << endl
-	<< "set far threshold " << farThreshold << " (press: < >) num blobs found " << contourFinder.nBlobs
 	<< ", fps: " << ofGetFrameRate() << endl
 	<< "press c to close the connection and o to open it again, connection is: " << kinect.isConnected() << endl;
 
