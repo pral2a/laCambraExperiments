@@ -30,6 +30,8 @@ public:
 	
 	void drawInstructions();
 	void drawPointCloud();
+	void drawFakePointCloud();
+
 	void drawFilm();
 	
 	void keyPressed(int key);
@@ -64,4 +66,6 @@ public:
     bool bRecording;
     void startRecord();
     void stopRecord();
+    void recordFilm();
+    void recordingComplete(ofxVideoRecorderOutputFileCompleteEventArgs& args);
 };

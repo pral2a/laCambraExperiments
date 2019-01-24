@@ -11,6 +11,11 @@ void ofApp::setup() {
 
 //	film.allocate(768, 768, GL_RGBA);
 
+    vidRecorder.setVideoCodec("prores");
+//    vidRecorder.setVideoBitrate("800k");
+    ofAddListener(vidRecorder.outputFileCompleteEvent, this, &ofApp::recordingComplete);
+
+
 	film.allocate(768, 768);
 
 	film.begin();
@@ -35,19 +40,15 @@ void ofApp::setup() {
 	}
 
 	bControlsOverlay = false;
+    bRecording = false;
 
-	ofSetFrameRate(60);
+	ofSetFrameRate(30);
 
 	// zero the tilt on startup
 	angle = 0;
 	kinect.setCameraTiltAngle(angle);
 
     vidRecorder.setFfmpegLocation(ofFilePath::getAbsolutePath("/usr/local/bin/ffmpeg"));
-
-    startRecord();
-
-    lastSavedFrame = ofGetElapsedTimeMillis();
-
 }
 
 //--------------------------------------------------------------
@@ -66,29 +67,7 @@ void ofApp::draw() {
 	ofBackground(0, 0, 0);
 
 	drawFilm();
-
-	// TODO: Testing video output. We'll test using static images instead.
-
-	if (ofGetElapsedTimeMillis() - lastSavedFrame > 1000) {
-
-
-		film.readToPixels(filmFrame);
-
-		bool success = vidRecorder.addFrame(filmFrame);
-
-	    if (!success) {
-	        ofLogWarning("This frame was not added!");
-	    } else {
-	    	ofLogWarning("Saved!");
-	    	lastSavedFrame = ofGetElapsedTimeMillis();
-	    }
-
-	    if (vidRecorder.hasVideoError()) {
-	        ofLogWarning("The video recorder failed to write some frames!");
-	    }
-
-
-	}
+	recordFilm();
 
 	film.draw(0,0);
 
@@ -96,6 +75,56 @@ void ofApp::draw() {
 		drawInstructions();
 	}
 
+    if(bRecording){
+    	ofSetColor(255, 0, 0);
+    	ofDrawCircle(ofGetWidth() - 20, 20, 5);
+    }
+
+}
+
+void ofApp::recordFilm(){
+	// Storing an image works fine
+	// ofSaveImage(filmFrame, "save.png", OF_IMAGE_QUALITY_BEST);
+
+	if(bRecording){
+
+		film.readToPixels(filmFrame);
+
+		bool success = vidRecorder.addFrame(filmFrame);
+
+	    if (!success) {
+	        ofLogWarning("This frame was not added!");
+	    }
+
+	    if (vidRecorder.hasVideoError()) {
+	        ofLogWarning("The video recorder failed to write some frames!");
+	    }
+	}
+
+}
+
+void ofApp::recordingComplete(ofxVideoRecorderOutputFileCompleteEventArgs& args){
+    ofLogWarning("The recoded video file is now complete.");
+}
+
+void ofApp::drawFakePointCloud() {
+	int width = 640;
+	int height = 480;
+	ofMesh mesh;
+	int step = 5;
+	for (int y = 0; y < height; y += step){
+	    for (int x = 0; x<width; x += step){
+	        mesh.addVertex(ofPoint(x,y,0)); // make a new vertex
+	        mesh.addColor(ofFloatColor(255,255,255));  // add a color at that vertex
+	    }
+	}
+
+	glPointSize(3);
+	ofPushMatrix();
+	ofEnableDepthTest();
+	mesh.drawVertices();
+	ofDisableDepthTest();
+	ofPopMatrix();
 }
 
 void ofApp::drawPointCloud() {
@@ -127,13 +156,14 @@ void ofApp::drawFilm(){
 	film.begin();
 	ofBackground(0, 0, 0);
 	easyCam.begin();
-	drawPointCloud();
+	drawFakePointCloud();
 	easyCam.end();
 	film.end();
 }
 
 //--------------------------------------------------------------
 void ofApp::exit() {
+    ofRemoveListener(vidRecorder.outputFileCompleteEvent, this, &ofApp::recordingComplete);
 	kinect.setCameraTiltAngle(0); // zero the tilt on exit
 	kinect.close();
     stopRecord();
@@ -142,11 +172,10 @@ void ofApp::exit() {
 //--------------------------------------------------------------
 
 void ofApp::startRecord() {
-
-    bRecording = true;
-
-    if(bRecording && !vidRecorder.isInitialized()) {
-        vidRecorder.setup("laCambra.mp4", 768, 768, 30, 44100, 2);
+    if(!vidRecorder.isInitialized()) {
+    	bRecording = true;
+    	ofLogNotice() << "Recording!";
+        vidRecorder.setup(ofGetTimestampString()+"laCambra.mov", 768, 768, 30);
     }
 
     vidRecorder.start();
@@ -154,14 +183,22 @@ void ofApp::startRecord() {
 }
 
 void ofApp::stopRecord() {
-    bRecording = false;
-    vidRecorder.close();
-
+    if(bRecording) {
+    	bRecording = false;
+    	ofLogNotice() << "Stop Recording!";
+    	vidRecorder.close();
+ 	}
 }
 
 //--------------------------------------------------------------
 void ofApp::keyPressed (int key) {
 	switch (key) {
+		case 'r':
+			startRecord();
+			break;
+		case 's':
+			stopRecord();
+			break;
 		case 'q':
 			bControlsOverlay = !bControlsOverlay;
 			break;
@@ -233,9 +270,15 @@ void ofApp::drawInstructions() {
 		<< "motor / led / accel controls are not currently supported" << endl << endl;
     }
 
-	reportStream << "press p to switch between images and point cloud, rotate the point cloud with the mouse" << endl
-	<< ", fps: " << ofGetFrameRate() << endl
+	reportStream << "fps: " << ofGetFrameRate() << endl
 	<< "press c to close the connection and o to open it again, connection is: " << kinect.isConnected() << endl;
+
+    if (bRecording) {
+    	reportStream << "video queue size: " << vidRecorder.getVideoQueueSize() << endl;
+    }
+
+    reportStream << (bRecording?"pause":"start") << " recording: r" << endl;
+    reportStream << (bRecording?"close current video file: s":"") << endl;
 
     if(kinect.hasCamTiltControl()) {
     	reportStream << "press UP and DOWN to change the tilt angle: " << angle << " degrees" << endl
