@@ -22,21 +22,21 @@ void ofApp::setup() {
     film.end();
 
 	// enable depth->video image calibration
-	// kinect.setRegistration(true);
+	kinect.setRegistration(true);
 
-	// kinect.init();
+	kinect.init();
 	//kinect.init(true); // shows infrared instead of RGB video image
 	//kinect.init(false, false); // disable video image (faster fps)
 
-	// kinect.open();		// opens first available kinect
+	kinect.open();		// opens first available kinect
 
 	// print the intrinsic IR sensor values
-	// if(kinect.isConnected()) {
-	// 	ofLogNotice() << "sensor-emitter dist: " << kinect.getSensorEmitterDistance() << "cm";
-	// 	ofLogNotice() << "sensor-camera dist:  " << kinect.getSensorCameraDistance() << "cm";
-	// 	ofLogNotice() << "zero plane pixel size: " << kinect.getZeroPlanePixelSize() << "mm";
-	// 	ofLogNotice() << "zero plane dist: " << kinect.getZeroPlaneDistance() << "mm";
-	// }
+	if(kinect.isConnected()) {
+		ofLogNotice() << "sensor-emitter dist: " << kinect.getSensorEmitterDistance() << "cm";
+		ofLogNotice() << "sensor-camera dist:  " << kinect.getSensorCameraDistance() << "cm";
+		ofLogNotice() << "zero plane pixel size: " << kinect.getZeroPlanePixelSize() << "mm";
+		ofLogNotice() << "zero plane dist: " << kinect.getZeroPlaneDistance() << "mm";
+	}
 
 	bControlsOverlay = false;
     bRecording = false;
@@ -45,19 +45,18 @@ void ofApp::setup() {
 
 	// zero the tilt on startup
 	angle = 0;
-	// kinect.setCameraTiltAngle(angle);
+	kinect.setCameraTiltAngle(angle);
 
     vidRecorder.setFfmpegLocation(ofFilePath::getAbsolutePath("/usr/local/bin/ffmpeg"));
 }
 
 //--------------------------------------------------------------
 void ofApp::update() {
-	// kinect.update();
+	kinect.update();
 
-	// there is a new frame and we are connected
-	// if(kinect.isFrameNew()) {
-
-	// }
+	if(kinect.isFrameNew()) {
+		recordFilm();
+	}
 
 }
 
@@ -66,7 +65,6 @@ void ofApp::draw() {
 	ofBackground(0, 0, 0);
 
 	drawFilm();
-	recordFilm();
 
 	film.draw(0,0);
 
@@ -126,7 +124,7 @@ void ofApp::drawFakePointCloud() {
 	ofPopMatrix();
 }
 
-/*void ofApp::drawPointCloud() {
+void ofApp::drawPointCloud() {
 	int w = 640;
 	int h = 480;
 	ofMesh mesh;
@@ -149,13 +147,13 @@ void ofApp::drawFakePointCloud() {
 	mesh.drawVertices();
 	ofDisableDepthTest();
 	ofPopMatrix();
-}*/
+}
 
 void ofApp::drawFilm(){
 	film.begin();
 	ofBackground(0, 0, 0);
 	easyCam.begin();
-	drawFakePointCloud();
+	drawPointCloud();
 	easyCam.end();
 	film.end();
 }
