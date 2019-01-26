@@ -17,6 +17,8 @@ void ofApp::setup() {
 
 	film.allocate(2048, 1080, GL_RGB);
 
+	//film.allocate(3840, 2160, GL_RGB);
+
 	film.begin();
     ofClear(255,255,255, 0);
     film.end();
@@ -40,6 +42,12 @@ void ofApp::setup() {
 
 	bControlsOverlay = false;
     bRecording = false;
+    bPrevRealSize = false;
+
+	bDrawVertices = true;
+	bDrawWireframe = false;
+	bDrawFaces = false;
+	bViewOrbit = false;
 
 	ofSetFrameRate(60);
 
@@ -47,11 +55,17 @@ void ofApp::setup() {
 	angle = 0;
 	kinect.setCameraTiltAngle(angle);
 
+	sMeshMode = 0;
+	panAngle = 0;
+	tiltAngle = 0;
+	pointSize = 3.0;
+
     vidRecorder.setFfmpegLocation(ofFilePath::getAbsolutePath("/usr/local/bin/ffmpeg"));
 }
 
 //--------------------------------------------------------------
 void ofApp::update() {
+
 	kinect.update();
 
 	if(kinect.isFrameNew()) {
@@ -66,7 +80,7 @@ void ofApp::draw() {
 
 	drawFilm();
 
-	film.draw(0,0);
+	drawPreview();
 
 	if(bControlsOverlay) {
 		drawInstructions();
@@ -76,6 +90,19 @@ void ofApp::draw() {
     	ofSetColor(255, 0, 0);
     	ofDrawCircle(ofGetWidth() - 20, 20, 5);
     }
+
+}
+
+void ofApp::drawPreview(){
+	if (bPrevRealSize) {
+
+		int xPos = (ofGetWidth() - film.getWidth())/2;
+		int yPos = (ofGetHeight() - film.getHeight())/2;
+
+		film.draw(xPos, yPos);
+	} else {
+		film.draw(0,0, ofGetWidth(), ofGetHeight());
+	}
 
 }
 
@@ -104,7 +131,7 @@ void ofApp::recordingComplete(ofxVideoRecorderOutputFileCompleteEventArgs& args)
     ofLogWarning("The recoded video file is now complete.");
 }
 
-void ofApp::drawFakePointCloud() {
+/*void ofApp::drawFakePointCloud() {
 	int width = 640;
 	int height = 480;
 	ofMesh mesh;
@@ -122,13 +149,15 @@ void ofApp::drawFakePointCloud() {
 	mesh.drawVertices();
 	ofDisableDepthTest();
 	ofPopMatrix();
-}
+}*/
 
 void ofApp::drawPointCloud() {
 	int w = 640;
 	int h = 480;
 	ofMesh mesh;
-	mesh.setMode(OF_PRIMITIVE_POINTS);
+
+	mesh.setMode(meshMode());
+
 	int step = 2;
 	for(int y = 0; y < h; y += step) {
 		for(int x = 0; x < w; x += step) {
@@ -138,18 +167,33 @@ void ofApp::drawPointCloud() {
 			}
 		}
 	}
-	glPointSize(3);
+	glPointSize(pointSize);
 	ofPushMatrix();
+	ofRotateY(panAngle);
+	ofRotateX(tiltAngle);
 	// the projected points are 'upside down' and 'backwards'
 	ofScale(1, -1, -1);
 	ofTranslate(0, 0, -1000); // center the points a bit
+
+
 	ofEnableDepthTest();
-	mesh.drawVertices();
+
+	if (bDrawVertices) mesh.drawVertices();
+	if (bDrawWireframe) mesh.drawWireframe();
+	if (bDrawFaces) mesh.drawFaces();
+
 	ofDisableDepthTest();
 	ofPopMatrix();
 }
 
+ofPrimitiveMode ofApp::meshMode(){
+	ofPrimitiveMode meshModes[7] = {OF_PRIMITIVE_POINTS, OF_PRIMITIVE_TRIANGLES, OF_PRIMITIVE_TRIANGLE_STRIP, OF_PRIMITIVE_TRIANGLE_FAN, OF_PRIMITIVE_LINES, OF_PRIMITIVE_LINE_STRIP, OF_PRIMITIVE_LINE_LOOP};
+	return meshModes[sMeshMode];
+}
+
 void ofApp::drawFilm(){
+
+
 	film.begin();
 	ofBackground(0, 0, 0);
 	easyCam.begin();
@@ -199,7 +243,41 @@ void ofApp::keyPressed (int key) {
 		case 'q':
 			bControlsOverlay = !bControlsOverlay;
 			break;
-	}
+		case 'v':
+			bPrevRealSize = !bPrevRealSize;
+			break;
+		case '1':
+			bDrawVertices = !bDrawVertices;
+			break;
+		case '2':
+			bDrawFaces = !bDrawFaces;
+			break;
+		case '3':
+			bDrawWireframe = !bDrawWireframe;
+			break;
+		case 'm':
+			if(sMeshMode > 7) sMeshMode = 0;
+			sMeshMode++;
+			break;
+		case 'p':
+			pointSize += 0.1;
+			break;
+		case 'l':
+			pointSize -= 0.1;
+			break;
+		case OF_KEY_RIGHT:
+     		panAngle += 0.100f;
+			break;
+		case OF_KEY_LEFT:
+     		panAngle -= 0.100f;
+			break;
+		case OF_KEY_UP:
+     		tiltAngle += 0.100f;
+			break;
+		case OF_KEY_DOWN:
+     		tiltAngle -= 0.100f;
+			break;
+		}
 }
 
 //--------------------------------------------------------------
@@ -223,6 +301,8 @@ void ofApp::drawInstructions() {
     	reportStream << "press UP and DOWN to change the tilt angle: " << angle << " degrees" << endl
         << "press 1-5 & 0 to change the led mode" << endl;
     }
+
+    reportStream << "point size: " << pointSize << endl;
 
 	ofDrawBitmapString(reportStream.str(), 20, 652);
 }

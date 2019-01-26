@@ -33,6 +33,7 @@ public:
 	void drawFakePointCloud();
 
 	void drawFilm();
+	void drawPreview();
 	
 	void keyPressed(int key);
 	void mouseDragged(int x, int y, int button);
@@ -41,16 +42,26 @@ public:
 	void mouseEntered(int x, int y);
 	void mouseExited(int x, int y);
 	void windowResized(int w, int h);
+	ofPrimitiveMode meshMode();
 	
 	ofxKinect kinect;
 		
 	bool bThreshWithOpenCV;
 	bool bControlsOverlay;
+	bool bPrevRealSize;
+	bool bDrawVertices;
+	bool bDrawWireframe;
+	bool bDrawFaces;
+	bool bViewOrbit;
 
 	int nearThreshold;
 	int farThreshold;
 	
+	float panAngle;
+	float tiltAngle;
 	int angle;
+	int sMeshMode;
+	float pointSize;
 
 	long lastSavedFrame;
 	
