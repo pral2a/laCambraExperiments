@@ -4,6 +4,12 @@
 ###########################
 
 */bin/*
+!*/bin/data/
+
+###
+# Keep data for conf but exlude video exports
+###
+*.mov
 
 #########
 # general

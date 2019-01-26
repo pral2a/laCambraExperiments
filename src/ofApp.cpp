@@ -15,50 +15,49 @@ void ofApp::setup() {
 //    vidRecorder.setVideoBitrate("800k");
     ofAddListener(vidRecorder.outputFileCompleteEvent, this, &ofApp::recordingComplete);
 
-
-	film.allocate(768, 768);
+	film.allocate(2048, 1080, GL_RGB);
 
 	film.begin();
     ofClear(255,255,255, 0);
     film.end();
 
 	// enable depth->video image calibration
-	kinect.setRegistration(true);
+	// kinect.setRegistration(true);
 
-	kinect.init();
+	// kinect.init();
 	//kinect.init(true); // shows infrared instead of RGB video image
 	//kinect.init(false, false); // disable video image (faster fps)
 
-	kinect.open();		// opens first available kinect
+	// kinect.open();		// opens first available kinect
 
 	// print the intrinsic IR sensor values
-	if(kinect.isConnected()) {
-		ofLogNotice() << "sensor-emitter dist: " << kinect.getSensorEmitterDistance() << "cm";
-		ofLogNotice() << "sensor-camera dist:  " << kinect.getSensorCameraDistance() << "cm";
-		ofLogNotice() << "zero plane pixel size: " << kinect.getZeroPlanePixelSize() << "mm";
-		ofLogNotice() << "zero plane dist: " << kinect.getZeroPlaneDistance() << "mm";
-	}
+	// if(kinect.isConnected()) {
+	// 	ofLogNotice() << "sensor-emitter dist: " << kinect.getSensorEmitterDistance() << "cm";
+	// 	ofLogNotice() << "sensor-camera dist:  " << kinect.getSensorCameraDistance() << "cm";
+	// 	ofLogNotice() << "zero plane pixel size: " << kinect.getZeroPlanePixelSize() << "mm";
+	// 	ofLogNotice() << "zero plane dist: " << kinect.getZeroPlaneDistance() << "mm";
+	// }
 
 	bControlsOverlay = false;
     bRecording = false;
 
-	ofSetFrameRate(30);
+	ofSetFrameRate(60);
 
 	// zero the tilt on startup
 	angle = 0;
-	kinect.setCameraTiltAngle(angle);
+	// kinect.setCameraTiltAngle(angle);
 
     vidRecorder.setFfmpegLocation(ofFilePath::getAbsolutePath("/usr/local/bin/ffmpeg"));
 }
 
 //--------------------------------------------------------------
 void ofApp::update() {
-	kinect.update();
+	// kinect.update();
 
 	// there is a new frame and we are connected
-	if(kinect.isFrameNew()) {
+	// if(kinect.isFrameNew()) {
 
-	}
+	// }
 
 }
 
@@ -127,7 +126,7 @@ void ofApp::drawFakePointCloud() {
 	ofPopMatrix();
 }
 
-void ofApp::drawPointCloud() {
+/*void ofApp::drawPointCloud() {
 	int w = 640;
 	int h = 480;
 	ofMesh mesh;
@@ -150,7 +149,7 @@ void ofApp::drawPointCloud() {
 	mesh.drawVertices();
 	ofDisableDepthTest();
 	ofPopMatrix();
-}
+}*/
 
 void ofApp::drawFilm(){
 	film.begin();
@@ -164,8 +163,8 @@ void ofApp::drawFilm(){
 //--------------------------------------------------------------
 void ofApp::exit() {
     ofRemoveListener(vidRecorder.outputFileCompleteEvent, this, &ofApp::recordingComplete);
-	kinect.setCameraTiltAngle(0); // zero the tilt on exit
-	kinect.close();
+	// kinect.setCameraTiltAngle(0); // zero the tilt on exit
+	// kinect.close();
     stopRecord();
 }
 
@@ -175,7 +174,7 @@ void ofApp::startRecord() {
     if(!vidRecorder.isInitialized()) {
     	bRecording = true;
     	ofLogNotice() << "Recording!";
-        vidRecorder.setup(ofGetTimestampString()+"laCambra.mov", 768, 768, 30);
+        vidRecorder.setup(ofGetTimestampString()+"laCambra.mov", film.getWidth(), film.getHeight(), 30);
     }
 
     vidRecorder.start();
@@ -202,55 +201,6 @@ void ofApp::keyPressed (int key) {
 		case 'q':
 			bControlsOverlay = !bControlsOverlay;
 			break;
-		case 'w':
-			kinect.enableDepthNearValueWhite(!kinect.isDepthNearValueWhite());
-			break;
-
-		case 'o':
-			kinect.setCameraTiltAngle(angle); // go back to prev tilt
-			kinect.open();
-			break;
-
-		case 'c':
-			kinect.setCameraTiltAngle(0); // zero the tilt
-			kinect.close();
-			break;
-
-		case '1':
-			kinect.setLed(ofxKinect::LED_GREEN);
-			break;
-
-		case '2':
-			kinect.setLed(ofxKinect::LED_YELLOW);
-			break;
-
-		case '3':
-			kinect.setLed(ofxKinect::LED_RED);
-			break;
-
-		case '4':
-			kinect.setLed(ofxKinect::LED_BLINK_GREEN);
-			break;
-
-		case '5':
-			kinect.setLed(ofxKinect::LED_BLINK_YELLOW_RED);
-			break;
-
-		case '0':
-			kinect.setLed(ofxKinect::LED_OFF);
-			break;
-
-		case OF_KEY_UP:
-			angle++;
-			if(angle>30) angle=30;
-			kinect.setCameraTiltAngle(angle);
-			break;
-
-		case OF_KEY_DOWN:
-			angle--;
-			if(angle<-30) angle=-30;
-			kinect.setCameraTiltAngle(angle);
-			break;
 	}
 }
 
@@ -261,17 +211,8 @@ void ofApp::drawInstructions() {
 
 	stringstream reportStream;
 
-    if(kinect.hasAccelControl()) {
-        reportStream << "accel is: " << ofToString(kinect.getMksAccel().x, 2) << " / "
-        << ofToString(kinect.getMksAccel().y, 2) << " / "
-        << ofToString(kinect.getMksAccel().z, 2) << endl;
-    } else {
-        reportStream << "Note: this is a newer Xbox Kinect or Kinect For Windows device," << endl
-		<< "motor / led / accel controls are not currently supported" << endl << endl;
-    }
-
-	reportStream << "fps: " << ofGetFrameRate() << endl
-	<< "press c to close the connection and o to open it again, connection is: " << kinect.isConnected() << endl;
+	reportStream << "fps: " << ofGetFrameRate() << endl;
+	// << "press c to close the connection and o to open it again, connection is: " << kinect.isConnected() << endl;
 
     if (bRecording) {
     	reportStream << "video queue size: " << vidRecorder.getVideoQueueSize() << endl;
