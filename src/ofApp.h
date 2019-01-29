@@ -59,6 +59,7 @@ public:
 	
 	float panAngle;
 	float tiltAngle;
+	int stepRes;
 	int angle;
 	int sMeshMode;
 	float pointSize;

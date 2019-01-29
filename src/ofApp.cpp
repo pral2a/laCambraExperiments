@@ -60,6 +60,8 @@ void ofApp::setup() {
 	tiltAngle = 0;
 	pointSize = 3.0;
 
+	stepRes = 2;
+
     vidRecorder.setFfmpegLocation(ofFilePath::getAbsolutePath("/usr/local/bin/ffmpeg"));
 }
 
@@ -158,7 +160,8 @@ void ofApp::drawPointCloud() {
 
 	mesh.setMode(meshMode());
 
-	int step = 2;
+	if (stepRes < 2) stepRes = 2;
+	int step = stepRes;
 	for(int y = 0; y < h; y += step) {
 		for(int x = 0; x < w; x += step) {
 			if(kinect.getDistanceAt(x, y) > 0) {
@@ -260,10 +263,16 @@ void ofApp::keyPressed (int key) {
 			sMeshMode++;
 			break;
 		case 'p':
-			pointSize += 0.1;
+			pointSize += 0.1f;
 			break;
 		case 'l':
-			pointSize -= 0.1;
+			pointSize -= 0.1f;
+			break;
+		case 'o':
+			stepRes++;
+			break;
+		case 'k':
+			stepRes--;
 			break;
 		case OF_KEY_RIGHT:
      		panAngle += 0.100f;
@@ -272,10 +281,10 @@ void ofApp::keyPressed (int key) {
      		panAngle -= 0.100f;
 			break;
 		case OF_KEY_UP:
-     		tiltAngle += 0.100f;
+     		tiltAngle += 1.500f;
 			break;
 		case OF_KEY_DOWN:
-     		tiltAngle -= 0.100f;
+     		tiltAngle -= 1.500f;
 			break;
 		}
 }
