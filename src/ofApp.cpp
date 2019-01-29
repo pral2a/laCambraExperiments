@@ -62,7 +62,11 @@ void ofApp::setup() {
 
 	stepRes = 2;
 
+	frameNumber = 0;
+
     vidRecorder.setFfmpegLocation(ofFilePath::getAbsolutePath("/usr/local/bin/ffmpeg"));
+
+	waitForThread(true);
 }
 
 //--------------------------------------------------------------
@@ -170,6 +174,9 @@ void ofApp::drawPointCloud() {
 			}
 		}
 	}
+
+    if(bRecording) pointsSaver.send(mesh);
+
 	glPointSize(pointSize);
 	ofPushMatrix();
 	ofRotateY(panAngle);
@@ -205,12 +212,24 @@ void ofApp::drawFilm(){
 	film.end();
 }
 
+void ofApp::threadedFunction(){
+    ofMesh pointCloud;
+    while(pointsSaver.receive(pointCloud)){
+    	frameNumber++;
+    	char fileName[13];
+    	sprintf(fileName,"%06d-pc.ply",frameNumber);
+        pointCloud.save(ofToDataPath(fileName), true);
+    }
+}
+
 //--------------------------------------------------------------
 void ofApp::exit() {
     ofRemoveListener(vidRecorder.outputFileCompleteEvent, this, &ofApp::recordingComplete);
 	// kinect.setCameraTiltAngle(0); // zero the tilt on exit
 	// kinect.close();
     stopRecord();
+    pointsSaver.close();
+  	waitForThread(true);
 }
 
 //--------------------------------------------------------------

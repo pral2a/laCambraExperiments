@@ -20,7 +20,7 @@
 //
 // No way around the Windows driver dance, sorry.
 
-class ofApp : public ofBaseApp {
+class ofApp : public ofBaseApp, public ofThread{
 public:
 	
 	void setup();
@@ -64,6 +64,8 @@ public:
 	int sMeshMode;
 	float pointSize;
 
+	int frameNumber;
+
 	long lastSavedFrame;
 	
 	// used for viewing the point cloud
@@ -80,4 +82,9 @@ public:
     void stopRecord();
     void recordFilm();
     void recordingComplete(ofxVideoRecorderOutputFileCompleteEventArgs& args);
+
+    ofThreadChannel<ofMesh> pointsSaver;
+
+    void threadedFunction();
+
 };
