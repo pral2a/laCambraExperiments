@@ -66,7 +66,7 @@ void ofApp::setup() {
 
     vidRecorder.setFfmpegLocation(ofFilePath::getAbsolutePath("/usr/local/bin/ffmpeg"));
 
-	waitForThread(true);
+	startThread();
 }
 
 //--------------------------------------------------------------

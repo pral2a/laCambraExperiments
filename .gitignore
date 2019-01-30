@@ -10,6 +10,7 @@
 # Keep data for conf but exlude video exports
 ###
 *.mov
+*.ply
 
 #########
 # general

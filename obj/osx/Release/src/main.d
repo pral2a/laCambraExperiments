@@ -1,6 +1,6 @@
 obj/osx/Release/src/main.o: \
-  /Users/g11m/dev/of/examples/computer_vision/LaCambraCam/src/main.cpp \
-  /Users/g11m/dev/of/examples/computer_vision/LaCambraCam/src/ofApp.h \
+  /Users/g11m/dev/of/apps/myApps/LaCambraCam/src/main.cpp \
+  /Users/g11m/dev/of/apps/myApps/LaCambraCam/src/ofApp.h \
   /Users/g11m/dev/of/libs/openFrameworks/ofMain.h \
   /Users/g11m/dev/of/libs/openFrameworks/utils/ofConstants.h \
   /Users/g11m/dev/of/libs/glew/include/GL/glew.h \
@@ -882,7 +882,7 @@ obj/osx/Release/src/main.o: \
   /Users/g11m/dev/of/addons/ofxPoco/libs/poco/include/Poco/Event.h \
   /Users/g11m/dev/of/addons/ofxPoco/libs/poco/include/Poco/Event_POSIX.h
 
-/Users/g11m/dev/of/examples/computer_vision/LaCambraCam/src/ofApp.h:
+/Users/g11m/dev/of/apps/myApps/LaCambraCam/src/ofApp.h:
 
 /Users/g11m/dev/of/libs/openFrameworks/ofMain.h:
 
