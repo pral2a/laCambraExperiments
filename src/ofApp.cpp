@@ -70,7 +70,13 @@ void ofApp::setup() {
 	startThread();
 
 	previousFrameTime = 0;
-}
+
+	ofFileDialogResult result = ofSystemLoadDialog("Select project folder", true);
+		if(result.bSuccess) {
+	  		string path = result.getPath();
+	  		ofSetDataPathRoot(path + "/");
+		}
+	}
 
 //--------------------------------------------------------------
 void ofApp::update() {
@@ -359,31 +365,23 @@ void ofApp::keyPressed (int key) {
 			break;
 		case 'p':
 			pointSize += 0.1f;
-			break;
 		case 'l':
 			pointSize -= 0.1f;
-			break;
 		case 'o':
 			stepRes++;
-			break;
 		case 'k':
 			stepRes--;
-			break;
 		case 'n':
 			loadTake();
 			break;
 		case OF_KEY_RIGHT:
      		panAngle += 0.100f;
-			break;
 		case OF_KEY_LEFT:
      		panAngle -= 0.100f;
-			break;
 		case OF_KEY_UP:
      		tiltAngle += 1.500f;
-			break;
 		case OF_KEY_DOWN:
      		tiltAngle -= 1.500f;
-			break;
 		}
 }
 
