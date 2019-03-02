@@ -9,6 +9,7 @@
 void ofApp::setup() {
 	ofSetLogLevel(OF_LOG_VERBOSE);
 
+
 //	film.allocate(768, 768, GL_RGBA);
 
     vidRecorder.setVideoCodec("prores");
@@ -216,9 +217,10 @@ void ofApp::threadedFunction(){
     ofMesh pointCloud;
     while(pointsSaver.receive(pointCloud)){
     	frameNumber++;
-    	char fileName[13];
-    	sprintf(fileName,"%06d-pc.ply",frameNumber);
-        pointCloud.save(ofToDataPath(fileName), true);
+    	char fileName[20];
+    	sprintf(fileName,"pc-%06d.ply",frameNumber);
+    	string pointPath = pointsDirPath + fileName;
+        pointCloud.save(pointPath, true);
     }
 }
 
@@ -236,9 +238,12 @@ void ofApp::exit() {
 
 void ofApp::startRecord() {
     if(!vidRecorder.isInitialized()) {
-    	bRecording = true;
+    	createTakeDirectory();
     	ofLogNotice() << "Recording!";
-        vidRecorder.setup(ofGetTimestampString()+"laCambra.mov", film.getWidth(), film.getHeight(), 30);
+    	string videoRecordingName = ofGetTimestampString()+".mov";
+    	string videoRecordingPath = takeDirPath + videoRecordingName;
+        vidRecorder.setup(videoRecordingPath, film.getWidth(), film.getHeight(), 30);
+        bRecording = true;
     }
 
     vidRecorder.start();
@@ -251,6 +256,31 @@ void ofApp::stopRecord() {
     	ofLogNotice() << "Stop Recording!";
     	vidRecorder.close();
  	}
+}
+
+void ofApp::createTakeDirectory(){
+	ofDirectory takeDir;
+
+	takeDirPath = ofToDataPath("take-" + ofGetTimestampString()) + "/";
+
+	takeDir.open(takeDirPath);
+
+	if(!takeDir.exists()){
+    	takeDir.create(true);
+
+    	ofDirectory pointsDir;
+
+		pointsDirPath = takeDirPath + "/" + "points" + "/";
+
+		pointsDir.open(pointsDirPath);
+
+		if(!pointsDir.exists()){
+	    	pointsDir.create(true);
+		}
+
+		ofLogNotice() << "Take folder created!";
+
+	}
 }
 
 //--------------------------------------------------------------

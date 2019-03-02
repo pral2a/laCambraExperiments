@@ -87,4 +87,8 @@ public:
 
     void threadedFunction();
 
+    void createTakeDirectory();
+
+    string takeDirPath;
+    string pointsDirPath;
 };
