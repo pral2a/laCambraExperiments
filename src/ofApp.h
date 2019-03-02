@@ -78,6 +78,7 @@ public:
 	ofPixels filmFrame;
 
     bool bRecording;
+    bool bEncoding;
     void startRecord();
     void stopRecord();
     void recordFilm();

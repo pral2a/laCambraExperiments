@@ -43,6 +43,7 @@ void ofApp::setup() {
 
 	bControlsOverlay = false;
     bRecording = false;
+    bEncoding = false;
     bPrevRealSize = false;
 
 	bDrawVertices = true;
@@ -135,6 +136,7 @@ void ofApp::recordFilm(){
 }
 
 void ofApp::recordingComplete(ofxVideoRecorderOutputFileCompleteEventArgs& args){
+	bEncoding = false;
     ofLogWarning("The recoded video file is now complete.");
 }
 
@@ -237,14 +239,19 @@ void ofApp::exit() {
 //--------------------------------------------------------------
 
 void ofApp::startRecord() {
-    if(!vidRecorder.isInitialized()) {
-    	createTakeDirectory();
-    	ofLogNotice() << "Recording!";
-    	string videoRecordingName = ofGetTimestampString()+".mov";
-    	string videoRecordingPath = takeDirPath + videoRecordingName;
-        vidRecorder.setup(videoRecordingPath, film.getWidth(), film.getHeight(), 30);
-        bRecording = true;
-    }
+	if(!bEncoding){
+		if(!vidRecorder.isInitialized()) {
+	    	createTakeDirectory();
+	    	ofLogNotice() << "Recording!";
+	    	string videoRecordingName = ofGetTimestampString()+".mov";
+	    	string videoRecordingPath = takeDirPath + videoRecordingName;
+	        vidRecorder.setup(videoRecordingPath, film.getWidth(), film.getHeight(), 30);
+	        bRecording = true;
+	        bEncoding = true;
+    	}
+	} else {
+	   ofLogNotice() << "Wait! Still encoding!";
+	}
 
     vidRecorder.start();
 
