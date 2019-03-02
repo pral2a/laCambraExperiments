@@ -79,6 +79,7 @@ public:
 
     bool bRecording;
     bool bEncoding;
+    bool bReplay;
     void startRecord();
     void stopRecord();
     void recordFilm();
@@ -90,6 +91,14 @@ public:
 
     void createTakeDirectory();
 
+    void loadTake();
+
+    string fixPath;
+
     string takeDirPath;
     string pointsDirPath;
+
+    ofMesh pointCloud;
+
+    long previousFrameTime;
 };

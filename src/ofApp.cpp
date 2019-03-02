@@ -68,6 +68,8 @@ void ofApp::setup() {
     vidRecorder.setFfmpegLocation(ofFilePath::getAbsolutePath("/usr/local/bin/ffmpeg"));
 
 	startThread();
+
+	previousFrameTime = 0;
 }
 
 //--------------------------------------------------------------
@@ -162,22 +164,38 @@ void ofApp::recordingComplete(ofxVideoRecorderOutputFileCompleteEventArgs& args)
 void ofApp::drawPointCloud() {
 	int w = 640;
 	int h = 480;
-	ofMesh mesh;
+	ofMesh pointCloud;
 
-	mesh.setMode(meshMode());
+	pointCloud.setMode(meshMode());
 
-	if (stepRes < 2) stepRes = 2;
-	int step = stepRes;
-	for(int y = 0; y < h; y += step) {
-		for(int x = 0; x < w; x += step) {
-			if(kinect.getDistanceAt(x, y) > 0) {
-				mesh.addColor(ofColor(255,255,255));
-				mesh.addVertex(kinect.getWorldCoordinateAt(x, y));
+	if(bReplay) {
+		// TODO: Framerate needs to increase every 1/30 seconds
+		long now = ofGetElapsedTimeMillis();
+		int frameTime = 1000/30;
+		if(now - previousFrameTime >= frameTime) {
+			previousFrameTime = ofGetElapsedTimeMillis();
+			frameNumber++;
+			char fileName[20];
+			sprintf(fileName,"pc-%06d.ply",frameNumber);
+			string pointPath = fixPath + "/" + fileName;
+			pointCloud.load(pointPath);
+		}
+
+	} else {
+		if (stepRes < 2) stepRes = 2;
+		int step = stepRes;
+		for(int y = 0; y < h; y += step) {
+			for(int x = 0; x < w; x += step) {
+				if(kinect.getDistanceAt(x, y) > 0) {
+					pointCloud.addColor(ofColor(255,255,255));
+					pointCloud.addVertex(kinect.getWorldCoordinateAt(x, y));
+				}
 			}
 		}
+    	if(bRecording) pointsSaver.send(pointCloud);	
 	}
 
-    if(bRecording) pointsSaver.send(mesh);
+
 
 	glPointSize(pointSize);
 	ofPushMatrix();
@@ -190,9 +208,9 @@ void ofApp::drawPointCloud() {
 
 	ofEnableDepthTest();
 
-	if (bDrawVertices) mesh.drawVertices();
-	if (bDrawWireframe) mesh.drawWireframe();
-	if (bDrawFaces) mesh.drawFaces();
+	if (bDrawVertices) pointCloud.drawVertices();
+	if (bDrawWireframe) pointCloud.drawWireframe();
+	if (bDrawFaces) pointCloud.drawFaces();
 
 	ofDisableDepthTest();
 	ofPopMatrix();
@@ -289,6 +307,28 @@ void ofApp::createTakeDirectory(){
 	}
 }
 
+void ofApp::loadTake(){
+	ofFileDialogResult openFileResult = ofSystemLoadDialog("Select a take folder to replay", true);
+
+	//Check if the user opened a file
+	if (openFileResult.bSuccess){
+
+		ofLogVerbose("User selected a file");
+
+		// string fixPath = "/Users/g11m/dev/of/apps/myApps/LaCambraCam/bin/data/take-2019-03-02-15-02-48-515/points/";
+   		fixPath = openFileResult.getPath();
+
+   		ofLogNotice() << fixPath;
+
+    	bReplay = true;
+
+	} else {
+		ofLogVerbose("User hit cancel");
+	}
+
+
+}
+
 //--------------------------------------------------------------
 void ofApp::keyPressed (int key) {
 	switch (key) {
@@ -328,6 +368,9 @@ void ofApp::keyPressed (int key) {
 			break;
 		case 'k':
 			stepRes--;
+			break;
+		case 'n':
+			loadTake();
 			break;
 		case OF_KEY_RIGHT:
      		panAngle += 0.100f;
