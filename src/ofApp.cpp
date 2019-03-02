@@ -54,8 +54,7 @@ void ofApp::setup() {
 	ofSetFrameRate(60);
 
 	// zero the tilt on startup
-	angle = 0;
-	kinect.setCameraTiltAngle(angle);
+	kinect.setCameraTiltAngle(0);
 
 	sMeshMode = 0;
 	panAngle = 0;
@@ -222,15 +221,15 @@ void ofApp::threadedFunction(){
     	char fileName[20];
     	sprintf(fileName,"pc-%06d.ply",frameNumber);
     	string pointPath = pointsDirPath + fileName;
-        pointCloud.save(pointPath, true);
+        pointCloud.save(pointPath);
     }
 }
 
 //--------------------------------------------------------------
 void ofApp::exit() {
     ofRemoveListener(vidRecorder.outputFileCompleteEvent, this, &ofApp::recordingComplete);
-	// kinect.setCameraTiltAngle(0); // zero the tilt on exit
-	// kinect.close();
+	kinect.setCameraTiltAngle(0); // zero the tilt on exit
+	kinect.close();
     stopRecord();
     pointsSaver.close();
   	waitForThread(true);
