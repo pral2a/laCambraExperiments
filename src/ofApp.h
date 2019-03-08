@@ -53,6 +53,7 @@ public:
 	bool bDrawWireframe;
 	bool bDrawFaces;
 	bool bViewOrbit;
+	bool bProxyMode;
 
 	int nearThreshold;
 	int farThreshold;

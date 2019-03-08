@@ -9,9 +9,9 @@
 void ofApp::setup() {
 	ofSetLogLevel(OF_LOG_VERBOSE);
 
-	bool proxyMode = true;
+	bProxyMode = true;
 
-	if(!proxyMode) {
+	if(!bProxyMode) {
 		vidRecorder.setVideoCodec("prores");
 		film.allocate(1024, 600, GL_RGB);
 	} else {
@@ -61,12 +61,8 @@ void ofApp::setup() {
 	panAngle = 0;
 	tiltAngle = 0;
 	pointSize = 3.0;
-
 	stepRes = 2;
-
 	frameNumber = 0;
-
-	vidRecorder.setFfmpegLocation(ofFilePath::getAbsolutePath("/usr/local/bin/ffmpeg"));
 
 	startThread();
 
@@ -127,13 +123,9 @@ void ofApp::drawPreview(){
 }
 
 void ofApp::recordFilm(){
-	// Storing an image works fine
-	// ofSaveImage(filmFrame, "save.png", OF_IMAGE_QUALITY_BEST);
-
 	if(bRecording){
 
 		film.readToPixels(filmFrame);
-
 		bool success = vidRecorder.addFrame(filmFrame);
 
 		if (!success) {
@@ -250,7 +242,12 @@ void ofApp::startRecord() {
 			createTakeDirectory();
 			ofLogNotice() << "Recording!";
 			kinect.setLed(ofxKinect::LED_BLINK_GREEN);
-			string videoRecordingName = ofGetTimestampString()+".mov";
+			string videoRecordingName;
+			if (bProxyMode) {
+				videoRecordingName = "proxy-"+ofGetTimestampString()+".mov";
+			} else {
+				videoRecordingName = ofGetTimestampString()+".mov";
+			}
 			string videoRecordingPath = takeDirPath + videoRecordingName;
 			vidRecorder.setup(videoRecordingPath, film.getWidth(), film.getHeight(), 30);
 			bRecording = true;
