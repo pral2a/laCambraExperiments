@@ -1,8 +1,8 @@
 #include "ofApp.h"
 
 /*
-    If you are struggling to get the device to connect ( especially Windows Users )
-    please look at the ReadMe: in addons/ofxKinect/README.md
+	If you are struggling to get the device to connect ( especially Windows Users )
+	please look at the ReadMe: in addons/ofxKinect/README.md
 */
 
 //--------------------------------------------------------------
@@ -10,19 +10,19 @@ void ofApp::setup() {
 	ofSetLogLevel(OF_LOG_VERBOSE);
 
 
-//	film.allocate(768, 768, GL_RGBA);
+//  film.allocate(768, 768, GL_RGBA);
 
-    vidRecorder.setVideoCodec("prores");
+	vidRecorder.setVideoCodec("prores");
 //    vidRecorder.setVideoBitrate("800k");
-    ofAddListener(vidRecorder.outputFileCompleteEvent, this, &ofApp::recordingComplete);
+	ofAddListener(vidRecorder.outputFileCompleteEvent, this, &ofApp::recordingComplete);
 
 	film.allocate(2048, 1080, GL_RGB);
 
 	//film.allocate(3840, 2160, GL_RGB);
 
 	film.begin();
-    ofClear(255,255,255, 0);
-    film.end();
+	ofClear(255,255,255, 0);
+	film.end();
 
 	// enable depth->video image calibration
 	kinect.setRegistration(true);
@@ -31,7 +31,7 @@ void ofApp::setup() {
 	//kinect.init(true); // shows infrared instead of RGB video image
 	//kinect.init(false, false); // disable video image (faster fps)
 
-	kinect.open();		// opens first available kinect
+	kinect.open();      // opens first available kinect
 
 	// print the intrinsic IR sensor values
 	if(kinect.isConnected()) {
@@ -42,9 +42,9 @@ void ofApp::setup() {
 	}
 
 	bControlsOverlay = false;
-    bRecording = false;
-    bEncoding = false;
-    bPrevRealSize = false;
+	bRecording = false;
+	bEncoding = false;
+	bPrevRealSize = false;
 
 	bDrawVertices = true;
 	bDrawWireframe = false;
@@ -65,7 +65,7 @@ void ofApp::setup() {
 
 	frameNumber = 0;
 
-    vidRecorder.setFfmpegLocation(ofFilePath::getAbsolutePath("/usr/local/bin/ffmpeg"));
+	vidRecorder.setFfmpegLocation(ofFilePath::getAbsolutePath("/usr/local/bin/ffmpeg"));
 
 	startThread();
 
@@ -73,8 +73,8 @@ void ofApp::setup() {
 
 	ofFileDialogResult result = ofSystemLoadDialog("Select project folder", true);
 		if(result.bSuccess) {
-	  		string path = result.getPath();
-	  		ofSetDataPathRoot(path + "/");
+			string path = result.getPath();
+			ofSetDataPathRoot(path + "/");
 		}
 	}
 
@@ -101,10 +101,10 @@ void ofApp::draw() {
 		drawInstructions();
 	}
 
-    if(bRecording){
-    	ofSetColor(255, 0, 0);
-    	ofDrawCircle(ofGetWidth() - 20, 20, 5);
-    }
+	if(bRecording){
+		ofSetColor(255, 0, 0);
+		ofDrawCircle(ofGetWidth() - 20, 20, 5);
+	}
 
 }
 
@@ -131,20 +131,20 @@ void ofApp::recordFilm(){
 
 		bool success = vidRecorder.addFrame(filmFrame);
 
-	    if (!success) {
-	        ofLogWarning("This frame was not added!");
-	    }
+		if (!success) {
+			ofLogWarning("This frame was not added!");
+		}
 
-	    if (vidRecorder.hasVideoError()) {
-	        ofLogWarning("The video recorder failed to write some frames!");
-	    }
+		if (vidRecorder.hasVideoError()) {
+			ofLogWarning("The video recorder failed to write some frames!");
+		}
 	}
 
 }
 
 void ofApp::recordingComplete(ofxVideoRecorderOutputFileCompleteEventArgs& args){
 	bEncoding = false;
-    ofLogWarning("The recoded video file is now complete.");
+	ofLogWarning("The recoded video file is now complete.");
 }
 
 /*void ofApp::drawFakePointCloud() {
@@ -153,10 +153,10 @@ void ofApp::recordingComplete(ofxVideoRecorderOutputFileCompleteEventArgs& args)
 	ofMesh mesh;
 	int step = 5;
 	for (int y = 0; y < height; y += step){
-	    for (int x = 0; x<width; x += step){
-	        mesh.addVertex(ofPoint(x,y,0)); // make a new vertex
-	        mesh.addColor(ofFloatColor(255,255,255));  // add a color at that vertex
-	    }
+		for (int x = 0; x<width; x += step){
+			mesh.addVertex(ofPoint(x,y,0)); // make a new vertex
+			mesh.addColor(ofFloatColor(255,255,255));  // add a color at that vertex
+		}
 	}
 
 	glPointSize(3);
@@ -198,7 +198,7 @@ void ofApp::drawPointCloud() {
 				}
 			}
 		}
-    	if(bRecording) pointsSaver.send(pointCloud);	
+		if(bRecording) pointsSaver.send(pointCloud);
 	}
 
 
@@ -239,24 +239,24 @@ void ofApp::drawFilm(){
 }
 
 void ofApp::threadedFunction(){
-    ofMesh pointCloud;
-    while(pointsSaver.receive(pointCloud)){
-    	frameNumber++;
-    	char fileName[20];
-    	sprintf(fileName,"pc-%06d.ply",frameNumber);
-    	string pointPath = pointsDirPath + fileName;
-        pointCloud.save(pointPath);
-    }
+	ofMesh pointCloud;
+	while(pointsSaver.receive(pointCloud)){
+		frameNumber++;
+		char fileName[20];
+		sprintf(fileName,"pc-%06d.ply",frameNumber);
+		string pointPath = pointsDirPath + fileName;
+		pointCloud.save(pointPath);
+	}
 }
 
 //--------------------------------------------------------------
 void ofApp::exit() {
-    ofRemoveListener(vidRecorder.outputFileCompleteEvent, this, &ofApp::recordingComplete);
+	ofRemoveListener(vidRecorder.outputFileCompleteEvent, this, &ofApp::recordingComplete);
 	kinect.setCameraTiltAngle(0); // zero the tilt on exit
 	kinect.close();
-    stopRecord();
-    pointsSaver.close();
-  	waitForThread(true);
+	stopRecord();
+	pointsSaver.close();
+	waitForThread(true);
 }
 
 //--------------------------------------------------------------
@@ -264,28 +264,28 @@ void ofApp::exit() {
 void ofApp::startRecord() {
 	if(!bEncoding){
 		if(!vidRecorder.isInitialized()) {
-	    	createTakeDirectory();
-	    	ofLogNotice() << "Recording!";
-	    	string videoRecordingName = ofGetTimestampString()+".mov";
-	    	string videoRecordingPath = takeDirPath + videoRecordingName;
-	        vidRecorder.setup(videoRecordingPath, film.getWidth(), film.getHeight(), 30);
-	        bRecording = true;
-	        bEncoding = true;
-    	}
+			createTakeDirectory();
+			ofLogNotice() << "Recording!";
+			string videoRecordingName = ofGetTimestampString()+".mov";
+			string videoRecordingPath = takeDirPath + videoRecordingName;
+			vidRecorder.setup(videoRecordingPath, film.getWidth(), film.getHeight(), 30);
+			bRecording = true;
+			bEncoding = true;
+		}
 	} else {
 	   ofLogNotice() << "Wait! Still encoding!";
 	}
 
-    vidRecorder.start();
+	vidRecorder.start();
 
 }
 
 void ofApp::stopRecord() {
-    if(bRecording) {
-    	bRecording = false;
-    	ofLogNotice() << "Stop Recording!";
-    	vidRecorder.close();
- 	}
+	if(bRecording) {
+		bRecording = false;
+		ofLogNotice() << "Stop Recording!";
+		vidRecorder.close();
+	}
 }
 
 void ofApp::createTakeDirectory(){
@@ -296,16 +296,16 @@ void ofApp::createTakeDirectory(){
 	takeDir.open(takeDirPath);
 
 	if(!takeDir.exists()){
-    	takeDir.create(true);
+		takeDir.create(true);
 
-    	ofDirectory pointsDir;
+		ofDirectory pointsDir;
 
 		pointsDirPath = takeDirPath + "/" + "points" + "/";
 
 		pointsDir.open(pointsDirPath);
 
 		if(!pointsDir.exists()){
-	    	pointsDir.create(true);
+			pointsDir.create(true);
 		}
 
 		ofLogNotice() << "Take folder created!";
@@ -322,11 +322,11 @@ void ofApp::loadTake(){
 		ofLogVerbose("User selected a file");
 
 		// string fixPath = "/Users/g11m/dev/of/apps/myApps/LaCambraCam/bin/data/take-2019-03-02-15-02-48-515/points/";
-   		fixPath = openFileResult.getPath();
+		fixPath = openFileResult.getPath();
 
-   		ofLogNotice() << fixPath;
+		ofLogNotice() << fixPath;
 
-    	bReplay = true;
+		bReplay = true;
 
 	} else {
 		ofLogVerbose("User hit cancel");
@@ -365,23 +365,31 @@ void ofApp::keyPressed (int key) {
 			break;
 		case 'p':
 			pointSize += 0.1f;
+			break;
 		case 'l':
 			pointSize -= 0.1f;
+			break;
 		case 'o':
 			stepRes++;
+			break;
 		case 'k':
 			stepRes--;
+			break;
 		case 'n':
 			loadTake();
 			break;
 		case OF_KEY_RIGHT:
-     		panAngle += 0.100f;
+			panAngle += 0.100f;
+			break;
 		case OF_KEY_LEFT:
-     		panAngle -= 0.100f;
+			panAngle -= 0.100f;
+			break;
 		case OF_KEY_UP:
-     		tiltAngle += 1.500f;
+			tiltAngle += 1.500f;
+			break;
 		case OF_KEY_DOWN:
-     		tiltAngle -= 1.500f;
+			tiltAngle -= 1.500f;
+			break;
 		}
 }
 
@@ -395,19 +403,19 @@ void ofApp::drawInstructions() {
 	reportStream << "fps: " << ofGetFrameRate() << endl;
 	// << "press c to close the connection and o to open it again, connection is: " << kinect.isConnected() << endl;
 
-    if (bRecording) {
-    	reportStream << "video queue size: " << vidRecorder.getVideoQueueSize() << endl;
-    }
+	if (bRecording) {
+		reportStream << "video queue size: " << vidRecorder.getVideoQueueSize() << endl;
+	}
 
-    reportStream << (bRecording?"pause":"start") << " recording: r" << endl;
-    reportStream << (bRecording?"close current video file: s":"") << endl;
+	reportStream << (bRecording?"pause":"start") << " recording: r" << endl;
+	reportStream << (bRecording?"close current video file: s":"") << endl;
 
-    if(kinect.hasCamTiltControl()) {
-    	reportStream << "press UP and DOWN to change the tilt angle: " << angle << " degrees" << endl
-        << "press 1-5 & 0 to change the led mode" << endl;
-    }
+	if(kinect.hasCamTiltControl()) {
+		reportStream << "press UP and DOWN to change the tilt angle: " << angle << " degrees" << endl
+		<< "press 1-5 & 0 to change the led mode" << endl;
+	}
 
-    reportStream << "point size: " << pointSize << endl;
+	reportStream << "point size: " << pointSize << endl;
 
 	ofDrawBitmapString(reportStream.str(), 20, 652);
 }
