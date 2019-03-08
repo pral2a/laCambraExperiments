@@ -9,16 +9,17 @@
 void ofApp::setup() {
 	ofSetLogLevel(OF_LOG_VERBOSE);
 
+	bool proxyMode = true;
 
-//  film.allocate(768, 768, GL_RGBA);
+	if(!proxyMode) {
+		vidRecorder.setVideoCodec("prores");
+		film.allocate(1024, 600, GL_RGB);
+	} else {
+		vidRecorder.setVideoCodec("prores");
+		film.allocate(2048, 1080, GL_RGB);		
+	}
 
-	vidRecorder.setVideoCodec("prores");
-//    vidRecorder.setVideoBitrate("800k");
 	ofAddListener(vidRecorder.outputFileCompleteEvent, this, &ofApp::recordingComplete);
-
-	film.allocate(2048, 1080, GL_RGB);
-
-	//film.allocate(3840, 2160, GL_RGB);
 
 	film.begin();
 	ofClear(255,255,255, 0);
@@ -72,11 +73,15 @@ void ofApp::setup() {
 	previousFrameTime = 0;
 
 	ofFileDialogResult result = ofSystemLoadDialog("Select project folder", true);
-		if(result.bSuccess) {
-			string path = result.getPath();
-			ofSetDataPathRoot(path + "/");
-		}
-	}
+		
+	if(result.bSuccess) {
+		string path = result.getPath();
+		ofSetDataPathRoot(path + "/");
+	} 
+
+	kinect.setLed(ofxKinect::LED_GREEN);
+
+}
 
 //--------------------------------------------------------------
 void ofApp::update() {
@@ -92,6 +97,7 @@ void ofApp::update() {
 //--------------------------------------------------------------
 void ofApp::draw() {
 	ofBackground(0, 0, 0);
+	ofSetColor(255, 255, 255);
 
 	drawFilm();
 
@@ -103,9 +109,8 @@ void ofApp::draw() {
 
 	if(bRecording){
 		ofSetColor(255, 0, 0);
-		ofDrawCircle(ofGetWidth() - 20, 20, 5);
+		ofDrawCircle(ofGetWidth() - 20, 20, 10);
 	}
-
 }
 
 void ofApp::drawPreview(){
@@ -144,28 +149,9 @@ void ofApp::recordFilm(){
 
 void ofApp::recordingComplete(ofxVideoRecorderOutputFileCompleteEventArgs& args){
 	bEncoding = false;
+	kinect.setLed(ofxKinect::LED_GREEN);
 	ofLogWarning("The recoded video file is now complete.");
 }
-
-/*void ofApp::drawFakePointCloud() {
-	int width = 640;
-	int height = 480;
-	ofMesh mesh;
-	int step = 5;
-	for (int y = 0; y < height; y += step){
-		for (int x = 0; x<width; x += step){
-			mesh.addVertex(ofPoint(x,y,0)); // make a new vertex
-			mesh.addColor(ofFloatColor(255,255,255));  // add a color at that vertex
-		}
-	}
-
-	glPointSize(3);
-	ofPushMatrix();
-	ofEnableDepthTest();
-	mesh.drawVertices();
-	ofDisableDepthTest();
-	ofPopMatrix();
-}*/
 
 void ofApp::drawPointCloud() {
 	int w = 640;
@@ -227,8 +213,6 @@ ofPrimitiveMode ofApp::meshMode(){
 }
 
 void ofApp::drawFilm(){
-
-
 	film.begin();
 	ofBackground(0, 0, 0);
 	easyCam.begin();
@@ -265,6 +249,7 @@ void ofApp::startRecord() {
 		if(!vidRecorder.isInitialized()) {
 			createTakeDirectory();
 			ofLogNotice() << "Recording!";
+			kinect.setLed(ofxKinect::LED_BLINK_GREEN);
 			string videoRecordingName = ofGetTimestampString()+".mov";
 			string videoRecordingPath = takeDirPath + videoRecordingName;
 			vidRecorder.setup(videoRecordingPath, film.getWidth(), film.getHeight(), 30);
@@ -272,6 +257,7 @@ void ofApp::startRecord() {
 			bEncoding = true;
 		}
 	} else {
+	   kinect.setLed(ofxKinect::LED_BLINK_YELLOW_RED);
 	   ofLogNotice() << "Wait! Still encoding!";
 	}
 
@@ -283,6 +269,7 @@ void ofApp::stopRecord() {
 	if(bRecording) {
 		bRecording = false;
 		ofLogNotice() << "Stop Recording!";
+		kinect.setLed(ofxKinect::LED_BLINK_YELLOW_RED);
 		vidRecorder.close();
 	}
 }
@@ -314,17 +301,11 @@ void ofApp::createTakeDirectory(){
 
 void ofApp::loadTake(){
 	ofFileDialogResult openFileResult = ofSystemLoadDialog("Select a take folder to replay", true);
-
 	//Check if the user opened a file
 	if (openFileResult.bSuccess){
-
 		ofLogVerbose("User selected a file");
-
-		// string fixPath = "/Users/g11m/dev/of/apps/myApps/LaCambraCam/bin/data/take-2019-03-02-15-02-48-515/points/";
 		fixPath = openFileResult.getPath();
-
 		ofLogNotice() << fixPath;
-
 		bReplay = true;
 
 	} else {
