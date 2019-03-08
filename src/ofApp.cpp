@@ -186,7 +186,6 @@ void ofApp::drawPointCloud() {
 			string pointPath = fixPath + "/" + fileName;
 			pointCloud.load(pointPath);
 		}
-
 	} else {
 		if (stepRes < 2) stepRes = 2;
 		int step = stepRes;
