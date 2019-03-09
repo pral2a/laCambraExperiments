@@ -179,7 +179,6 @@ void ofApp::drawPointCloud() {
 	}
 
 
-
 	glPointSize(pointSize);
 	ofPushMatrix();
 	ofRotateY(panAngle);
@@ -239,6 +238,7 @@ void ofApp::exit() {
 void ofApp::startRecord() {
 	if(!bEncoding){
 		if(!vidRecorder.isInitialized()) {
+			frameNumber = 0;
 			createTakeDirectory();
 			ofLogNotice() << "Recording!";
 			kinect.setLed(ofxKinect::LED_BLINK_GREEN);
@@ -378,21 +378,31 @@ void ofApp::drawInstructions() {
 	stringstream reportStream;
 
 	reportStream << "fps: " << ofGetFrameRate() << endl;
-	// << "press c to close the connection and o to open it again, connection is: " << kinect.isConnected() << endl;
+
+
+	if (bRecording) {
+		reportStream << "pointFilesSaved: " << frameNumber << endl;
+	}
 
 	if (bRecording) {
 		reportStream << "video queue size: " << vidRecorder.getVideoQueueSize() << endl;
 	}
 
 	reportStream << (bRecording?"pause":"start") << " recording: r" << endl;
-	reportStream << (bRecording?"close current video file: s":"") << endl;
+	reportStream << (bRecording?"stop recording: s":"") << endl;
 
-	if(kinect.hasCamTiltControl()) {
-		reportStream << "press UP and DOWN to change the tilt angle: " << angle << " degrees" << endl
-		<< "press 1-5 & 0 to change the led mode" << endl;
-	}
+	reportStream << "take: " << takeDirPath << endl;
+	reportStream << "video mode: " << (bProxyMode?"proxy":"full") << endl;
 
-	reportStream << "point size: " << pointSize << endl;
+	reportStream << "---------------------" << endl;;
+
+	reportStream << "point size [p]/[l]" << pointSize << endl;
+	reportStream << "point size [o]/[k]" << stepRes << endl;
+
+	reportStream << "---------------------" << endl;;
+
+	reportStream << "[v] prev real size" << endl;;
+	reportStream << "[q] ensable overlay" << endl;;
 
 	ofDrawBitmapString(reportStream.str(), 20, 652);
 }
