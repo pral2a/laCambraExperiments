@@ -80,6 +80,7 @@ public:
 
     bool bRecording;
     bool bEncoding;
+    bool bWrittingPoints;
     bool bReplay;
     void startRecord();
     void stopRecord();
@@ -87,6 +88,10 @@ public:
     void recordingComplete(ofxVideoRecorderOutputFileCompleteEventArgs& args);
 
     ofThreadChannel<ofMesh> pointsSaver;
+    
+    ofMesh pointCloud;
+    vector<ofMesh> pointClouds;
+
 
     void threadedFunction();
 
@@ -99,7 +104,7 @@ public:
     string takeDirPath;
     string pointsDirPath;
 
-    ofMesh pointCloud;
 
     long previousFrameTime;
+    long previousSavedFrameTime;
 };

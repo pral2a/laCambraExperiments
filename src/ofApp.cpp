@@ -45,6 +45,7 @@ void ofApp::setup() {
 	bControlsOverlay = false;
 	bRecording = false;
 	bEncoding = false;
+	bWrittingPoints = false;
 	bPrevRealSize = false;
 
 	bDrawVertices = true;
@@ -67,6 +68,7 @@ void ofApp::setup() {
 	startThread();
 
 	previousFrameTime = 0;
+	previousSavedFrameTime = 0;
 
 	ofFileDialogResult result = ofSystemLoadDialog("Select project folder", true);
 		
@@ -141,7 +143,6 @@ void ofApp::recordFilm(){
 
 void ofApp::recordingComplete(ofxVideoRecorderOutputFileCompleteEventArgs& args){
 	bEncoding = false;
-	kinect.setLed(ofxKinect::LED_GREEN);
 	ofLogWarning("The recoded video file is now complete.");
 }
 
@@ -175,9 +176,29 @@ void ofApp::drawPointCloud() {
 				}
 			}
 		}
-		if(bRecording) pointsSaver.send(pointCloud);
-	}
+		if(bRecording) {
+			pointClouds.push_back(pointCloud);
+		} 
 
+		if(!pointClouds.empty()){
+			bWrittingPoints = true;
+
+			long now = ofGetElapsedTimeMillis();
+			if(now - previousSavedFrameTime >= 2000) {
+				vector<ofMesh>::iterator firstIt = pointClouds.begin();
+				pointsSaver.send(*firstIt);
+				pointClouds.erase(firstIt);
+				previousSavedFrameTime = ofGetElapsedTimeMillis();
+			}
+		} else {
+			bWrittingPoints = false;
+		}
+
+		if(!bEncoding && !bWrittingPoints) {
+			kinect.setLed(ofxKinect::LED_GREEN);
+		}
+
+	} 
 
 	glPointSize(pointSize);
 	ofPushMatrix();
@@ -236,7 +257,7 @@ void ofApp::exit() {
 //--------------------------------------------------------------
 
 void ofApp::startRecord() {
-	if(!bEncoding){
+	if(!bEncoding && !bWrittingPoints){
 		if(!vidRecorder.isInitialized()) {
 			frameNumber = 0;
 			createTakeDirectory();
@@ -379,14 +400,17 @@ void ofApp::drawInstructions() {
 
 	reportStream << "fps: " << ofGetFrameRate() << endl;
 
-
-	if (bRecording) {
-		reportStream << "pointFilesSaved: " << frameNumber << endl;
+	if(bEncoding && bWrittingPoints) {
+		reportStream << "== WAIT!  ENCODING! ==" << endl;
 	}
 
-	if (bRecording) {
-		reportStream << "video queue size: " << vidRecorder.getVideoQueueSize() << endl;
-	}
+	reportStream << "----- TRANSCODER -----" << endl;;
+	reportStream << "points saved: " << frameNumber << endl;
+	reportStream << "points queue: " << pointClouds.size() << endl;
+	reportStream << "points pending: " << pointClouds.size() - frameNumber << endl;
+	reportStream << "video queue size: " << vidRecorder.getVideoQueueSize() << endl;
+	reportStream << "----------------------" << endl;
+	
 
 	reportStream << (bRecording?"pause":"start") << " recording: r" << endl;
 	reportStream << (bRecording?"stop recording: s":"") << endl;
@@ -404,7 +428,7 @@ void ofApp::drawInstructions() {
 	reportStream << "[v] prev real size" << endl;;
 	reportStream << "[q] ensable overlay" << endl;;
 
-	ofDrawBitmapString(reportStream.str(), 20, 652);
+	ofDrawBitmapString(reportStream.str(), 20, 400);
 }
 
 //--------------------------------------------------------------
