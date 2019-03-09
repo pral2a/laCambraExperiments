@@ -92,6 +92,10 @@ void ofApp::update() {
 		recordFilm();
 	}
 
+	if(pointsSaver.empty()){
+		bWrittingPoints = false;
+	}
+
 }
 
 //--------------------------------------------------------------
@@ -120,7 +124,7 @@ void ofApp::draw() {
 	if(!bPrevRealSize) {
 		ofNoFill();
 		ofSetColor(255, 255, 255);
-		ofDrawRectangle(270,20, ofGetWidth()-270-40, ofGetHeight()-20-40);
+		ofDrawRectangle(270,50, ofGetWidth()-270-40, ofGetHeight()-50-40);
 		ofFill();
 	}
 
@@ -134,7 +138,7 @@ void ofApp::drawPreview(){
 
 		film.draw(xPos, yPos);
 	} else {
-		film.draw(270,20, ofGetWidth()-270-40, ofGetHeight()-20-40);
+		film.draw(270,50, ofGetWidth()-270-40, ofGetHeight()-50-40);
 	}
 
 }
@@ -204,11 +208,6 @@ void ofApp::drawPointCloud() {
 		if(!bEncoding && !bWrittingPoints) {
 			kinect.setLed(ofxKinect::LED_GREEN);
 		}
-
-		if(pointsSaver.empty()){
-			bWrittingPoints = false;
-		}
-
 	} 
 
 	glPointSize(pointSize);
@@ -414,25 +413,20 @@ void ofApp::drawInstructions() {
 
 	stringstream reportStream;
 
-	reportStream << " " << endl;;
-	reportStream << " " << endl;;
-
-	reportStream << " " << endl;;
-	reportStream << " " << endl;;
-
-
+	reportStream << " " << endl;
 	if(!bRecording && (bEncoding || bWrittingPoints)) {
+		int p = round(((float) frameNumber / (float) frameNumberSent)*100);
 		reportStream << ">> Take: " << takeName << endl;
-		reportStream << "Wait... encoding in progress!" << endl;
-		reportStream << ((frameNumber / frameNumberSent) * 100) << "%" << " completed" << endl;
+		reportStream << "  Wait! " << p << "%" << " encoding complete" << endl;
+		reportStream << " " << endl;
 	} else if (bRecording) {
 		reportStream << ">> Take: " << takeName << endl;
-		reportStream << "Recording in progress!" << endl;
-		reportStream << "[s] to stop" << endl;
+		reportStream << "  Recording in progress!" << endl;
+		reportStream << "  [s] to stop" << endl;
 	} else if (!bRecording) {
 		reportStream << ">> Ready!" << endl;
 		reportStream << " " << endl;
-		reportStream << "[r] to record" << endl;	
+		reportStream << "  [r] to record" << endl;	
 	} else {
 		reportStream << " " << endl;
 		reportStream << " " << endl;
@@ -445,27 +439,29 @@ void ofApp::drawInstructions() {
 	reportStream << " " << endl;;
 
 	reportStream << "# Frames" << endl;
-	reportStream << "  FPS" << ofGetFrameRate() << endl;
+	reportStream << "  FPS: " << round(ofGetFrameRate()) << endl;
 	reportStream << " " << endl;;
 	
 	reportStream << "# Points" << endl;
+	reportStream << "  Total: " << frameNumberSent << endl;
+	reportStream << "  Pending: " << (frameNumberSent >= frameNumber ? frameNumberSent - frameNumber : 0 ) << endl;
 	reportStream << "  Saved: " << frameNumber << endl;
-	reportStream << "  Queue: " << frameNumberSent << endl;
-	reportStream << "  Pending: " << frameNumberSent - frameNumber << endl;
 	reportStream << " " << endl;;
 	
 	reportStream << "# Video" << endl;
-	reportStream << "  Saved: " << vidRecorder.getVideoQueueSize() - vidRecorder.getNumVideoFramesRecorded()  << endl;
-	reportStream << "  Queue: " << vidRecorder.getVideoQueueSize() << endl;
-	reportStream << "  Pending: " << vidRecorder.getNumVideoFramesRecorded()  << endl;
+	reportStream << "  Total: " << vidRecorder.getNumVideoFramesRecorded() << endl;
+	reportStream << "  Pending: " << vidRecorder.getVideoQueueSize() << endl;
+	reportStream << "  Saved: " << (vidRecorder.getNumVideoFramesRecorded() >= vidRecorder.getVideoQueueSize() ? vidRecorder.getNumVideoFramesRecorded() - vidRecorder.getVideoQueueSize(): 0 ) << endl;
 	reportStream << "  Mode: " << (bProxyMode?"proxy":"full") << endl;
 
-	reportStream << " " << endl;;
-	reportStream << " " << endl;;
-	reportStream << "# Controls" << endl;;
-	reportStream << " [r]/[s] record / stop" << stepRes << endl;
+	reportStream << " " << endl;
+	reportStream << " " << endl;
+	reportStream << "# Controls" << endl;
+	reportStream << " [r]/[s] record / stop" << endl;
 	reportStream << " [p]/[l] point size: "  << pointSize << endl;
 	reportStream << " [o]/[k] point size: " << stepRes << endl;
+	reportStream << " [<]/[>] pan angle: " << panAngle << endl;
+	reportStream << " [up]/[dn] tilt angle: " << tiltAngle << endl;
 	reportStream << " [v] prev real size" << endl;;
 	reportStream << " [q] ensable overlay" << endl;;
 	reportStream << " " << endl;;
