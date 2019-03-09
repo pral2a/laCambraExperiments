@@ -8,7 +8,6 @@
 //--------------------------------------------------------------
 void ofApp::setup() {
 	ofSetLogLevel(OF_LOG_VERBOSE);
-
 	bProxyMode = true;
 
 	if(!bProxyMode) {
@@ -54,6 +53,8 @@ void ofApp::setup() {
 	bViewOrbit = false;
 
 	ofSetFrameRate(60);
+
+	int frameTime = 1000/30;
 
 	// zero the tilt on startup
 	kinect.setCameraTiltAngle(0);
@@ -156,7 +157,6 @@ void ofApp::drawPointCloud() {
 	if(bReplay) {
 		// TODO: Framerate needs to increase every 1/30 seconds
 		long now = ofGetElapsedTimeMillis();
-		int frameTime = 1000/30;
 		if(now - previousFrameTime >= frameTime) {
 			previousFrameTime = ofGetElapsedTimeMillis();
 			frameNumber++;
@@ -176,20 +176,27 @@ void ofApp::drawPointCloud() {
 				}
 			}
 		}
+
+
 		if(bRecording) {
-			pointClouds.push_back(pointCloud);
+			long now = ofGetElapsedTimeMillis();
+			if(now - previousFrameTime >= frameTime) {
+				previousFrameTime = ofGetElapsedTimeMillis();
+				pointClouds.push_back(pointCloud);
+			}
 		} 
 
 		if(!pointClouds.empty()){
 			bWrittingPoints = true;
 
 			long now = ofGetElapsedTimeMillis();
-			if(now - previousSavedFrameTime >= 2000) {
+			if(now - previousSavedFrameTime >= 100) {
 				vector<ofMesh>::iterator firstIt = pointClouds.begin();
 				pointsSaver.send(*firstIt);
 				pointClouds.erase(firstIt);
 				previousSavedFrameTime = ofGetElapsedTimeMillis();
 			}
+
 		} else {
 			bWrittingPoints = false;
 		}
@@ -260,6 +267,7 @@ void ofApp::startRecord() {
 	if(!bEncoding && !bWrittingPoints){
 		if(!vidRecorder.isInitialized()) {
 			frameNumber = 0;
+			previousFrameTime = 0;
 			createTakeDirectory();
 			ofLogNotice() << "Recording!";
 			kinect.setLed(ofxKinect::LED_BLINK_GREEN);
@@ -400,7 +408,7 @@ void ofApp::drawInstructions() {
 
 	reportStream << "fps: " << ofGetFrameRate() << endl;
 
-	if(bEncoding && bWrittingPoints) {
+	if(bEncoding || bWrittingPoints) {
 		reportStream << "== WAIT!  ENCODING! ==" << endl;
 	}
 

@@ -107,4 +107,7 @@ public:
 
     long previousFrameTime;
     long previousSavedFrameTime;
+
+    int frameTime;
+
 };
