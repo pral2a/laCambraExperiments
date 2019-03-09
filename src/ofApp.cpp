@@ -65,6 +65,7 @@ void ofApp::setup() {
 	pointSize = 3.0;
 	stepRes = 2;
 	frameNumber = 0;
+	frameNumberSent = 0;
 
 	startThread();
 
@@ -98,7 +99,12 @@ void ofApp::draw() {
 	ofBackground(0, 0, 0);
 	ofSetColor(255, 255, 255);
 
-	drawFilm();
+	if(!bRecording && (bEncoding || bWrittingPoints)){
+		ofSetColor(255, 255, 0);
+		ofDrawCircle(ofGetWidth() - 20, 20, 10);
+	} else {
+		drawFilm();
+	}
 
 	drawPreview();
 
@@ -110,6 +116,14 @@ void ofApp::draw() {
 		ofSetColor(255, 0, 0);
 		ofDrawCircle(ofGetWidth() - 20, 20, 10);
 	}
+
+	if(!bPrevRealSize) {
+		ofNoFill();
+		ofSetColor(255, 255, 255);
+		ofDrawRectangle(270,20, ofGetWidth()-270-40, ofGetHeight()-20-40);
+		ofFill();
+	}
+
 }
 
 void ofApp::drawPreview(){
@@ -120,7 +134,7 @@ void ofApp::drawPreview(){
 
 		film.draw(xPos, yPos);
 	} else {
-		film.draw(0,0, ofGetWidth(), ofGetHeight());
+		film.draw(270,20, ofGetWidth()-270-40, ofGetHeight()-20-40);
 	}
 
 }
@@ -182,27 +196,17 @@ void ofApp::drawPointCloud() {
 			long now = ofGetElapsedTimeMillis();
 			if(now - previousFrameTime >= frameTime) {
 				previousFrameTime = ofGetElapsedTimeMillis();
-				pointClouds.push_back(pointCloud);
+				frameNumberSent++;
+				pointsSaver.send(pointCloud);
 			}
 		} 
 
-		if(!pointClouds.empty()){
-			bWrittingPoints = true;
-
-			long now = ofGetElapsedTimeMillis();
-			if(now - previousSavedFrameTime >= 100) {
-				vector<ofMesh>::iterator firstIt = pointClouds.begin();
-				pointsSaver.send(*firstIt);
-				pointClouds.erase(firstIt);
-				previousSavedFrameTime = ofGetElapsedTimeMillis();
-			}
-
-		} else {
-			bWrittingPoints = false;
-		}
-
 		if(!bEncoding && !bWrittingPoints) {
 			kinect.setLed(ofxKinect::LED_GREEN);
+		}
+
+		if(pointsSaver.empty()){
+			bWrittingPoints = false;
 		}
 
 	} 
@@ -243,6 +247,7 @@ void ofApp::drawFilm(){
 void ofApp::threadedFunction(){
 	ofMesh pointCloud;
 	while(pointsSaver.receive(pointCloud)){
+		bWrittingPoints = true;
 		frameNumber++;
 		char fileName[20];
 		sprintf(fileName,"pc-%06d.ply",frameNumber);
@@ -267,6 +272,7 @@ void ofApp::startRecord() {
 	if(!bEncoding && !bWrittingPoints){
 		if(!vidRecorder.isInitialized()) {
 			frameNumber = 0;
+			frameNumberSent = 0;
 			previousFrameTime = 0;
 			createTakeDirectory();
 			ofLogNotice() << "Recording!";
@@ -303,7 +309,9 @@ void ofApp::stopRecord() {
 void ofApp::createTakeDirectory(){
 	ofDirectory takeDir;
 
-	takeDirPath = ofToDataPath("take-" + ofGetTimestampString()) + "/";
+	takeName = "take-" + ofGetTimestampString();
+
+	takeDirPath = ofToDataPath(takeName + "/");
 
 	takeDir.open(takeDirPath);
 
@@ -406,37 +414,63 @@ void ofApp::drawInstructions() {
 
 	stringstream reportStream;
 
-	reportStream << "fps: " << ofGetFrameRate() << endl;
+	reportStream << " " << endl;;
+	reportStream << " " << endl;;
 
-	if(bEncoding || bWrittingPoints) {
-		reportStream << "== WAIT!  ENCODING! ==" << endl;
+	reportStream << " " << endl;;
+	reportStream << " " << endl;;
+
+
+	if(!bRecording && (bEncoding || bWrittingPoints)) {
+		reportStream << ">> Take: " << takeName << endl;
+		reportStream << "Wait... encoding in progress!" << endl;
+		reportStream << ((frameNumber / frameNumberSent) * 100) << "%" << " completed" << endl;
+	} else if (bRecording) {
+		reportStream << ">> Take: " << takeName << endl;
+		reportStream << "Recording in progress!" << endl;
+		reportStream << "[s] to stop" << endl;
+	} else if (!bRecording) {
+		reportStream << ">> Ready!" << endl;
+		reportStream << " " << endl;
+		reportStream << "[r] to record" << endl;	
+	} else {
+		reportStream << " " << endl;
+		reportStream << " " << endl;
 	}
 
-	reportStream << "----- TRANSCODER -----" << endl;;
-	reportStream << "points saved: " << frameNumber << endl;
-	reportStream << "points queue: " << pointClouds.size() << endl;
-	reportStream << "points pending: " << pointClouds.size() - frameNumber << endl;
-	reportStream << "video queue size: " << vidRecorder.getVideoQueueSize() << endl;
-	reportStream << "----------------------" << endl;
+	reportStream << " " << endl;;
+	reportStream << " " << endl;;
+
+	reportStream << " " << endl;;
+	reportStream << " " << endl;;
+
+	reportStream << "# Frames" << endl;
+	reportStream << "  FPS" << ofGetFrameRate() << endl;
+	reportStream << " " << endl;;
 	
+	reportStream << "# Points" << endl;
+	reportStream << "  Saved: " << frameNumber << endl;
+	reportStream << "  Queue: " << frameNumberSent << endl;
+	reportStream << "  Pending: " << frameNumberSent - frameNumber << endl;
+	reportStream << " " << endl;;
+	
+	reportStream << "# Video" << endl;
+	reportStream << "  Saved: " << vidRecorder.getVideoQueueSize() - vidRecorder.getNumVideoFramesRecorded()  << endl;
+	reportStream << "  Queue: " << vidRecorder.getVideoQueueSize() << endl;
+	reportStream << "  Pending: " << vidRecorder.getNumVideoFramesRecorded()  << endl;
+	reportStream << "  Mode: " << (bProxyMode?"proxy":"full") << endl;
 
-	reportStream << (bRecording?"pause":"start") << " recording: r" << endl;
-	reportStream << (bRecording?"stop recording: s":"") << endl;
+	reportStream << " " << endl;;
+	reportStream << " " << endl;;
+	reportStream << "# Controls" << endl;;
+	reportStream << " [r]/[s] record / stop" << stepRes << endl;
+	reportStream << " [p]/[l] point size: "  << pointSize << endl;
+	reportStream << " [o]/[k] point size: " << stepRes << endl;
+	reportStream << " [v] prev real size" << endl;;
+	reportStream << " [q] ensable overlay" << endl;;
+	reportStream << " " << endl;;
 
-	reportStream << "take: " << takeDirPath << endl;
-	reportStream << "video mode: " << (bProxyMode?"proxy":"full") << endl;
-
-	reportStream << "---------------------" << endl;;
-
-	reportStream << "point size [p]/[l]" << pointSize << endl;
-	reportStream << "point size [o]/[k]" << stepRes << endl;
-
-	reportStream << "---------------------" << endl;;
-
-	reportStream << "[v] prev real size" << endl;;
-	reportStream << "[q] ensable overlay" << endl;;
-
-	ofDrawBitmapString(reportStream.str(), 20, 400);
+	ofDrawBitmapString(reportStream.str(), 20, 20);
 }
 
 //--------------------------------------------------------------

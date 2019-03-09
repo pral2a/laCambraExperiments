@@ -66,6 +66,7 @@ public:
 	float pointSize;
 
 	int frameNumber;
+	int frameNumberSent;
 
 	long lastSavedFrame;
 	
@@ -103,6 +104,7 @@ public:
 
     string takeDirPath;
     string pointsDirPath;
+    string takeName;
 
 
     long previousFrameTime;
