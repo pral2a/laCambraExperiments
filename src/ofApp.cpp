@@ -7,7 +7,9 @@
 
 //--------------------------------------------------------------
 void ofApp::setup() {
-	ofSetLogLevel(OF_LOG_VERBOSE);
+	// ofSetLogLevel(OF_LOG_VERBOSE);
+	ofSetLogLevel(OF_LOG_SILENT);
+	
 	bProxyMode = true;
 
 	if(!bProxyMode) {
@@ -32,14 +34,6 @@ void ofApp::setup() {
 	//kinect.init(false, false); // disable video image (faster fps)
 
 	kinect.open();      // opens first available kinect
-
-	// print the intrinsic IR sensor values
-	if(kinect.isConnected()) {
-		ofLogNotice() << "sensor-emitter dist: " << kinect.getSensorEmitterDistance() << "cm";
-		ofLogNotice() << "sensor-camera dist:  " << kinect.getSensorCameraDistance() << "cm";
-		ofLogNotice() << "zero plane pixel size: " << kinect.getZeroPlanePixelSize() << "mm";
-		ofLogNotice() << "zero plane dist: " << kinect.getZeroPlaneDistance() << "mm";
-	}
 
 	bControlsOverlay = false;
 	bRecording = false;
@@ -180,7 +174,7 @@ void ofApp::drawPointCloud() {
 			frameNumber++;
 			char fileName[20];
 			sprintf(fileName,"pc-%06d.ply",frameNumber);
-			string pointPath = fixPath + "/" + fileName;
+			string pointPath = fixPath + "/points/" + fileName;
 			pointCloud.load(pointPath);
 		}
 	} else {
@@ -453,6 +447,16 @@ void ofApp::drawInstructions() {
 	reportStream << "  Pending: " << vidRecorder.getVideoQueueSize() << endl;
 	reportStream << "  Saved: " << (vidRecorder.getNumVideoFramesRecorded() >= vidRecorder.getVideoQueueSize() ? vidRecorder.getNumVideoFramesRecorded() - vidRecorder.getVideoQueueSize(): 0 ) << endl;
 	reportStream << "  Mode: " << (bProxyMode?"proxy":"full") << endl;
+	reportStream << "  Resolution: " << film.getWidth() << "x" << film.getHeight() << endl;
+	reportStream << "  Codec: " << "Apple ProRes" << endl;
+
+	if(kinect.isConnected()) {
+		reportStream << "# Kinect" << endl;
+		reportStream << " Emitter: " << kinect.getSensorEmitterDistance() << "cm" << endl;
+		reportStream << " Camera:  " << kinect.getSensorCameraDistance() << "cm" << endl;
+		reportStream << " Z0 plane pixel size: " << kinect.getZeroPlanePixelSize() << "mm" << endl;
+		reportStream << " Z0 plane dist: " << kinect.getZeroPlaneDistance() << "mm" << endl;
+	}
 
 	reportStream << " " << endl;
 	reportStream << " " << endl;
@@ -465,6 +469,8 @@ void ofApp::drawInstructions() {
 	reportStream << " [v] prev real size" << endl;;
 	reportStream << " [q] ensable overlay" << endl;;
 	reportStream << " " << endl;;
+
+
 
 	ofDrawBitmapString(reportStream.str(), 20, 20);
 }
