@@ -4,6 +4,7 @@
 #include "ofxOpenCv.h"
 #include "ofxKinect.h"
 #include "ofxVideoRecorder.h"
+#include "ofxPointCloud.h"
 
 // Windows users:
 // You MUST install the libfreenect kinect drivers in order to be able to use
@@ -88,12 +89,8 @@ public:
     void recordFilm();
     void recordingComplete(ofxVideoRecorderOutputFileCompleteEventArgs& args);
 
-    ofThreadChannel<ofMesh> pointsSaver;
+    ofThreadChannel<ofPointCloud> pointsSaver;
     
-    ofMesh pointCloud;
-    vector<ofMesh> pointClouds;
-
-
     void threadedFunction();
 
     void createTakeDirectory();
@@ -111,5 +108,8 @@ public:
     long previousSavedFrameTime;
 
     int frameTime;
+
+    // PointsSaver PS1;
+
 
 };

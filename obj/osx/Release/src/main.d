@@ -880,7 +880,8 @@ obj/osx/Release/src/main.o: \
   /Users/g11m/dev/of/addons/ofxPoco/libs/poco/include/Poco/Mutex_POSIX.h \
   /Users/g11m/dev/of/addons/ofxPoco/libs/poco/include/Poco/ScopedUnlock.h \
   /Users/g11m/dev/of/addons/ofxPoco/libs/poco/include/Poco/Event.h \
-  /Users/g11m/dev/of/addons/ofxPoco/libs/poco/include/Poco/Event_POSIX.h
+  /Users/g11m/dev/of/addons/ofxPoco/libs/poco/include/Poco/Event_POSIX.h \
+  /Users/g11m/dev/of/apps/myApps/LaCambraCam/src/ofxPointCloud.h
 
 /Users/g11m/dev/of/apps/myApps/LaCambraCam/src/ofApp.h:
 
@@ -2643,3 +2644,5 @@ obj/osx/Release/src/main.o: \
 /Users/g11m/dev/of/addons/ofxPoco/libs/poco/include/Poco/Event.h:
 
 /Users/g11m/dev/of/addons/ofxPoco/libs/poco/include/Poco/Event_POSIX.h:
+
+/Users/g11m/dev/of/apps/myApps/LaCambraCam/src/ofxPointCloud.h:

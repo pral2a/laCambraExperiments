@@ -7,8 +7,8 @@
 
 //--------------------------------------------------------------
 void ofApp::setup() {
-	// ofSetLogLevel(OF_LOG_VERBOSE);
-	ofSetLogLevel(OF_LOG_SILENT);
+	ofSetLogLevel(OF_LOG_VERBOSE);
+	// ofSetLogLevel(OF_LOG_SILENT);
 	
 	bProxyMode = true;
 
@@ -140,12 +140,12 @@ void ofApp::drawPreview(){
 void ofApp::recordFilm(){
 	if(bRecording){
 
-		film.readToPixels(filmFrame);
+/*		film.readToPixels(filmFrame);
 		bool success = vidRecorder.addFrame(filmFrame);
 
 		if (!success) {
 			ofLogWarning("This frame was not added!");
-		}
+		}*/
 
 		if (vidRecorder.hasVideoError()) {
 			ofLogWarning("The video recorder failed to write some frames!");
@@ -162,7 +162,7 @@ void ofApp::recordingComplete(ofxVideoRecorderOutputFileCompleteEventArgs& args)
 void ofApp::drawPointCloud() {
 	int w = 640;
 	int h = 480;
-	ofMesh pointCloud;
+	ofPointCloud pointCloud;
 
 	pointCloud.setMode(meshMode());
 
@@ -194,7 +194,7 @@ void ofApp::drawPointCloud() {
 			long now = ofGetElapsedTimeMillis();
 			if(now - previousFrameTime >= frameTime) {
 				previousFrameTime = ofGetElapsedTimeMillis();
-				frameNumberSent++;
+				pointCloud.setMeshNumber(frameNumberSent++);
 				pointsSaver.send(pointCloud);
 			}
 		} 
@@ -203,6 +203,7 @@ void ofApp::drawPointCloud() {
 			kinect.setLed(ofxKinect::LED_GREEN);
 		}
 	} 
+
 
 	glPointSize(pointSize);
 	ofPushMatrix();
@@ -221,6 +222,8 @@ void ofApp::drawPointCloud() {
 
 	ofDisableDepthTest();
 	ofPopMatrix();
+
+
 }
 
 ofPrimitiveMode ofApp::meshMode(){
@@ -238,8 +241,9 @@ void ofApp::drawFilm(){
 }
 
 void ofApp::threadedFunction(){
-	ofMesh pointCloud;
+	ofPointCloud pointCloud;
 	while(pointsSaver.receive(pointCloud)){
+		ofLogNotice() << "frameChannel: " << pointCloud.getMeshNumber();
 		bWrittingPoints = true;
 		frameNumber++;
 		char fileName[20];
@@ -426,21 +430,21 @@ void ofApp::drawInstructions() {
 		reportStream << " " << endl;
 	}
 
-	reportStream << " " << endl;;
-	reportStream << " " << endl;;
+	reportStream << " " << endl;
+	reportStream << " " << endl;
 
-	reportStream << " " << endl;;
-	reportStream << " " << endl;;
+	reportStream << " " << endl;
+	reportStream << " " << endl;
 
 	reportStream << "# Frames" << endl;
 	reportStream << "  FPS: " << round(ofGetFrameRate()) << endl;
-	reportStream << " " << endl;;
+	reportStream << " " << endl;
 	
 	reportStream << "# Points" << endl;
 	reportStream << "  Total: " << frameNumberSent << endl;
 	reportStream << "  Pending: " << (frameNumberSent >= frameNumber ? frameNumberSent - frameNumber : 0 ) << endl;
 	reportStream << "  Saved: " << frameNumber << endl;
-	reportStream << " " << endl;;
+	reportStream << " " << endl;
 	
 	reportStream << "# Video" << endl;
 	reportStream << "  Total: " << vidRecorder.getNumVideoFramesRecorded() << endl;
@@ -449,6 +453,7 @@ void ofApp::drawInstructions() {
 	reportStream << "  Mode: " << (bProxyMode?"proxy":"full") << endl;
 	reportStream << "  Resolution: " << film.getWidth() << "x" << film.getHeight() << endl;
 	reportStream << "  Codec: " << "Apple ProRes" << endl;
+	reportStream << " " << endl;
 
 	if(kinect.isConnected()) {
 		reportStream << "# Kinect" << endl;
@@ -466,9 +471,9 @@ void ofApp::drawInstructions() {
 	reportStream << " [o]/[k] point size: " << stepRes << endl;
 	reportStream << " [<]/[>] pan angle: " << panAngle << endl;
 	reportStream << " [up]/[dn] tilt angle: " << tiltAngle << endl;
-	reportStream << " [v] prev real size" << endl;;
-	reportStream << " [q] ensable overlay" << endl;;
-	reportStream << " " << endl;;
+	reportStream << " [v] prev real size" << endl;
+	reportStream << " [q] ensable overlay" << endl;
+	reportStream << " " << endl;
 
 
 
