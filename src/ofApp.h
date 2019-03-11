@@ -89,8 +89,8 @@ public:
     void recordFilm();
     void recordingComplete(ofxVideoRecorderOutputFileCompleteEventArgs& args);
    
-   	int const totalWorkers = 30;
-	ofSaveWorker W[30];  
+   	int const totalWorkers = 20;
+	ofSaveWorker W[20];  
 
     void createTakeDirectory();
 
@@ -105,6 +105,7 @@ public:
 
     long previousFrameTime;
     long previousSavedFrameTime;
+    long previousFolderCheckTime;
 
     int frameTime;
 

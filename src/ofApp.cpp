@@ -71,6 +71,7 @@ void ofApp::setup() {
     	
 	previousFrameTime = 0;
 	previousSavedFrameTime = 0;
+	previousFolderCheckTime = 0;
 
 	ofFileDialogResult result = ofSystemLoadDialog("Select project folder", true);
 		
@@ -92,9 +93,24 @@ void ofApp::update() {
 		recordFilm();
 	}
 
-	// if(W1.pointsSaver.empty()){
-	// 	bWrittingPoints = false;
-	// }
+	if(bWrittingPoints){
+		long now = ofGetElapsedTimeMillis();
+		if(now - previousFolderCheckTime >= 3000){
+			previousFolderCheckTime = ofGetElapsedTimeMillis();
+			ofDirectory pointsDir;
+	    	ofLogNotice() << "pointPath" << pointsDirPath;
+	   		pointsDir.open(pointsDirPath);
+	    	int numFiles = pointsDir.listDir();
+	    	frameNumber = numFiles;
+	    	ofLogNotice() << "frameNumberFolder" << numFiles;
+	    	if(frameNumber >= frameNumberSent){
+	    		bWrittingPoints = false;
+	    	}
+		}
+	
+	}
+
+
 
 }
 
@@ -200,6 +216,7 @@ void ofApp::drawPointCloud() {
 			long now = ofGetElapsedTimeMillis();
 			if(now - previousFrameTime >= frameTime) {
 				previousFrameTime = ofGetElapsedTimeMillis();
+				bWrittingPoints = true;
             	char fileName[20];
             	sprintf(fileName,"pc-%06d.ply",frameNumberSent);
             	string pointPath = pointsDirPath + fileName;
