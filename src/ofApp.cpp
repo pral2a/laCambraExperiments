@@ -61,7 +61,7 @@ void ofApp::setup() {
 	frameNumber = 0;
 	frameNumberSent = 0;
 
-	startThread();
+	W1.startThread();
 
 	previousFrameTime = 0;
 	previousSavedFrameTime = 0;
@@ -86,7 +86,7 @@ void ofApp::update() {
 		recordFilm();
 	}
 
-	if(pointsSaver.empty()){
+	if(W1.pointsSaver.empty()){
 		bWrittingPoints = false;
 	}
 
@@ -194,8 +194,12 @@ void ofApp::drawPointCloud() {
 			long now = ofGetElapsedTimeMillis();
 			if(now - previousFrameTime >= frameTime) {
 				previousFrameTime = ofGetElapsedTimeMillis();
-				pointCloud.setMeshNumber(frameNumberSent++);
-				pointsSaver.send(pointCloud);
+            	char fileName[20];
+            	sprintf(fileName,"pc-%06d.ply",frameNumberSent);
+            	string pointPath = pointsDirPath + fileName;
+				pointCloud.setSavePath(pointPath);
+				W1.pointsSaver.send(pointCloud);
+				frameNumberSent++;
 			}
 		} 
 
@@ -240,27 +244,14 @@ void ofApp::drawFilm(){
 	film.end();
 }
 
-void ofApp::threadedFunction(){
-	ofPointCloud pointCloud;
-	while(pointsSaver.receive(pointCloud)){
-		ofLogNotice() << "frameChannel: " << pointCloud.getMeshNumber();
-		bWrittingPoints = true;
-		frameNumber++;
-		char fileName[20];
-		sprintf(fileName,"pc-%06d.ply",frameNumber);
-		string pointPath = pointsDirPath + fileName;
-		pointCloud.save(pointPath);
-	}
-}
-
 //--------------------------------------------------------------
 void ofApp::exit() {
 	ofRemoveListener(vidRecorder.outputFileCompleteEvent, this, &ofApp::recordingComplete);
 	kinect.setCameraTiltAngle(0); // zero the tilt on exit
 	kinect.close();
 	stopRecord();
-	pointsSaver.close();
-	waitForThread(true);
+	W1.pointsSaver.close();
+	W1.waitForThread(true);
 }
 
 //--------------------------------------------------------------

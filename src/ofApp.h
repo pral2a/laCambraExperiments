@@ -89,10 +89,8 @@ public:
     void recordFilm();
     void recordingComplete(ofxVideoRecorderOutputFileCompleteEventArgs& args);
 
-    ofThreadChannel<ofPointCloud> pointsSaver;
+    ofSaveWorker W1;
     
-    void threadedFunction();
-
     void createTakeDirectory();
 
     void loadTake();

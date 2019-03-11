@@ -5,14 +5,14 @@ class ofPointCloud : public ofMesh {
     
     public:
 
-    int meshNumber;
+    string path;
 
-    void setMeshNumber(int _meshNumber){
-        meshNumber = _meshNumber;
+    void setSavePath(string _path){
+        path = _path;
     }    
 
-    int getMeshNumber(){
-        return meshNumber;
+    string getSavePath(){
+        return path;
     }
 
     // void save(const std::filesystem::path& path, bool useBinary = false){
@@ -20,6 +20,22 @@ class ofPointCloud : public ofMesh {
     // }
 
     // private:
+
+
+};
+
+class ofSaveWorker : public ofThread {
+    
+    public:
+
+    ofThreadChannel<ofPointCloud> pointsSaver;
+
+    void threadedFunction() {
+        ofPointCloud pointCloud;
+        while(pointsSaver.receive(pointCloud)){
+            pointCloud.save(pointCloud.getSavePath());
+        }
+    }
 
 
 };
