@@ -93,7 +93,7 @@ void ofApp::update() {
 		recordFilm();
 	}
 
-	if(bWrittingPoints){
+	if(!bRecording && bWrittingPoints){
 		long now = ofGetElapsedTimeMillis();
 		if(now - previousFolderCheckTime >= 3000){
 			previousFolderCheckTime = ofGetElapsedTimeMillis();
@@ -197,7 +197,8 @@ void ofApp::drawPointCloud() {
 			char fileName[20];
 			sprintf(fileName,"pc-%06d.ply",frameNumber);
 			string pointPath = fixPath + "/points/" + fileName;
-			pointCloud.load(pointPath);
+		    ofxBinaryMesh::load(pointPath, pointCloud);
+			// pointCloud.load(pointPath);
 		}
 	} else {
 		if (stepRes < 2) stepRes = 2;
@@ -355,6 +356,7 @@ void ofApp::loadTake(){
 		fixPath = openFileResult.getPath();
 		ofLogNotice() << fixPath;
 		bReplay = true;
+		frameNumber = 0;
 
 	} else {
 		ofLogVerbose("User hit cancel");

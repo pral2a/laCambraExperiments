@@ -1,5 +1,6 @@
 #include "ofMesh.h"
 #include "ofLog.h"
+#include "ofxBinaryMesh.h"
 
 class ofPointCloud : public ofMesh {
     
@@ -33,7 +34,8 @@ class ofSaveWorker : public ofThread {
     void threadedFunction() {
         ofPointCloud pointCloud;
         while(pointsSaver.receive(pointCloud)){
-            pointCloud.save(pointCloud.getSavePath());
+            ofxBinaryMesh::save(pointCloud.getSavePath(), pointCloud);
+            // pointCloud.save(pointCloud.getSavePath());
         }
     }
 

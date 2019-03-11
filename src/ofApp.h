@@ -5,6 +5,7 @@
 #include "ofxKinect.h"
 #include "ofxVideoRecorder.h"
 #include "ofxPointCloud.h"
+#include "ofxBinaryMesh.h"
 
 // Windows users:
 // You MUST install the libfreenect kinect drivers in order to be able to use
