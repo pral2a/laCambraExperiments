@@ -109,7 +109,4 @@ public:
 
     int frameTime;
 
-    // PointsSaver PS1;
-
-
 };

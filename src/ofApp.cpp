@@ -406,6 +406,13 @@ void ofApp::keyPressed (int key) {
 		case 'n':
 			loadTake();
 			break;
+		case 'g':
+			sMeshMode = 0;
+			panAngle = 0;
+			tiltAngle = 0;
+			pointSize = 3.0;
+			stepRes = 2;
+			break;
 		case OF_KEY_RIGHT:
 			panAngle += 0.100f;
 			break;
@@ -489,7 +496,8 @@ void ofApp::drawInstructions() {
 	reportStream << " [<]/[>] pan angle: " << panAngle << endl;
 	reportStream << " [up]/[dn] tilt angle: " << tiltAngle << endl;
 	reportStream << " [v] prev real size" << endl;
-	reportStream << " [q] ensable overlay" << endl;
+	reportStream << " [q] overlay ctrls" << endl;
+	reportStream << " [g] reset view" << endl;
 	reportStream << " " << endl;
 
 
