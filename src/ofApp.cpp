@@ -62,6 +62,7 @@ void ofApp::setup() {
 	frameNumberSent = 0;
 
 	W1.startThread();
+	W2.startThread();
 
 	previousFrameTime = 0;
 	previousSavedFrameTime = 0;
@@ -86,9 +87,9 @@ void ofApp::update() {
 		recordFilm();
 	}
 
-	if(W1.pointsSaver.empty()){
-		bWrittingPoints = false;
-	}
+	// if(W1.pointsSaver.empty()){
+	// 	bWrittingPoints = false;
+	// }
 
 }
 
@@ -198,7 +199,11 @@ void ofApp::drawPointCloud() {
             	sprintf(fileName,"pc-%06d.ply",frameNumberSent);
             	string pointPath = pointsDirPath + fileName;
 				pointCloud.setSavePath(pointPath);
-				W1.pointsSaver.send(pointCloud);
+				if ( frameNumberSent % 2 == 0) {
+					W1.pointsSaver.send(pointCloud);
+				} else {
+					W2.pointsSaver.send(pointCloud);
+				}
 				frameNumberSent++;
 			}
 		} 
@@ -252,6 +257,8 @@ void ofApp::exit() {
 	stopRecord();
 	W1.pointsSaver.close();
 	W1.waitForThread(true);
+	W2.pointsSaver.close();
+	W2.waitForThread(true);
 }
 
 //--------------------------------------------------------------

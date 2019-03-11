@@ -90,7 +90,8 @@ public:
     void recordingComplete(ofxVideoRecorderOutputFileCompleteEventArgs& args);
 
     ofSaveWorker W1;
-    
+    ofSaveWorker W2;
+   
     void createTakeDirectory();
 
     void loadTake();
