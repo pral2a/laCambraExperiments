@@ -88,10 +88,10 @@ public:
     void stopRecord();
     void recordFilm();
     void recordingComplete(ofxVideoRecorderOutputFileCompleteEventArgs& args);
-
-    ofSaveWorker W1;
-    ofSaveWorker W2;
    
+   	int const totalWorkers = 30;
+	ofSaveWorker W[30];  
+
     void createTakeDirectory();
 
     void loadTake();

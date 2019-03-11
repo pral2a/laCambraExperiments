@@ -7,17 +7,17 @@
 
 //--------------------------------------------------------------
 void ofApp::setup() {
-	ofSetLogLevel(OF_LOG_VERBOSE);
-	// ofSetLogLevel(OF_LOG_SILENT);
+	//ofSetLogLevel(OF_LOG_VERBOSE);
+	ofSetLogLevel(OF_LOG_SILENT);
 	
 	bProxyMode = true;
 
 	if(!bProxyMode) {
 		vidRecorder.setVideoCodec("prores");
-		film.allocate(1024, 600, GL_RGB);
+		film.allocate(2048, 1080, GL_RGB);
 	} else {
 		vidRecorder.setVideoCodec("prores");
-		film.allocate(2048, 1080, GL_RGB);		
+		film.allocate(1024, 600, GL_RGB);
 	}
 
 	ofAddListener(vidRecorder.outputFileCompleteEvent, this, &ofApp::recordingComplete);
@@ -61,9 +61,14 @@ void ofApp::setup() {
 	frameNumber = 0;
 	frameNumberSent = 0;
 
-	W1.startThread();
-	W2.startThread();
+	for(int i = 0; i < totalWorkers; i++){
+		ofSaveWorker W[i];
+	}
 
+	for(int i = 0; i < totalWorkers; i++){
+		W[i].startThread();
+	}
+    	
 	previousFrameTime = 0;
 	previousSavedFrameTime = 0;
 
@@ -141,12 +146,12 @@ void ofApp::drawPreview(){
 void ofApp::recordFilm(){
 	if(bRecording){
 
-/*		film.readToPixels(filmFrame);
+		film.readToPixels(filmFrame);
 		bool success = vidRecorder.addFrame(filmFrame);
 
 		if (!success) {
 			ofLogWarning("This frame was not added!");
-		}*/
+		}
 
 		if (vidRecorder.hasVideoError()) {
 			ofLogWarning("The video recorder failed to write some frames!");
@@ -199,11 +204,8 @@ void ofApp::drawPointCloud() {
             	sprintf(fileName,"pc-%06d.ply",frameNumberSent);
             	string pointPath = pointsDirPath + fileName;
 				pointCloud.setSavePath(pointPath);
-				if ( frameNumberSent % 2 == 0) {
-					W1.pointsSaver.send(pointCloud);
-				} else {
-					W2.pointsSaver.send(pointCloud);
-				}
+				int worker = frameNumberSent % totalWorkers;
+				W[worker].pointsSaver.send(pointCloud);
 				frameNumberSent++;
 			}
 		} 
@@ -255,10 +257,10 @@ void ofApp::exit() {
 	kinect.setCameraTiltAngle(0); // zero the tilt on exit
 	kinect.close();
 	stopRecord();
-	W1.pointsSaver.close();
-	W1.waitForThread(true);
-	W2.pointsSaver.close();
-	W2.waitForThread(true);
+	for(int i = 0; i < totalWorkers; i++){
+		W[i].pointsSaver.close();
+		W[i].waitForThread(true);
+	}
 }
 
 //--------------------------------------------------------------
