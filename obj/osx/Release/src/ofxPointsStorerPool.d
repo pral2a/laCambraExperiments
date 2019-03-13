@@ -1,6 +1,6 @@
-obj/osx/Release/src/main.o: \
-  /Users/g11m/dev/of/apps/myApps/LaCambraCam/src/main.cpp \
-  /Users/g11m/dev/of/apps/myApps/LaCambraCam/src/ofApp.h \
+obj/osx/Release/src/ofxPointsStorerPool.o: \
+  /Users/g11m/dev/of/apps/myApps/LaCambraCam/src/ofxPointsStorerPool.cpp \
+  /Users/g11m/dev/of/apps/myApps/LaCambraCam/src/ofxPointsStorerPool.h \
   /Users/g11m/dev/of/libs/openFrameworks/ofMain.h \
   /Users/g11m/dev/of/libs/openFrameworks/utils/ofConstants.h \
   /Users/g11m/dev/of/libs/glew/include/GL/glew.h \
@@ -822,70 +822,10 @@ obj/osx/Release/src/main.o: \
   /Users/g11m/dev/of/libs/openFrameworks/3d/of3dUtils.h \
   /Users/g11m/dev/of/libs/openFrameworks/3d/ofCamera.h \
   /Users/g11m/dev/of/libs/openFrameworks/3d/ofEasyCam.h \
-  /Users/g11m/dev/of/addons/ofxOpenCv/src/ofxOpenCv.h \
-  /Users/g11m/dev/of/addons/ofxOpenCv/src/ofxCvConstants.h \
-  /Users/g11m/dev/of/addons/ofxOpenCv/libs/opencv/include/opencv/cv.h \
-  /Users/g11m/dev/of/addons/ofxOpenCv/libs/opencv/include/opencv2/core/core_c.h \
-  /Users/g11m/dev/of/addons/ofxOpenCv/libs/opencv/include/opencv2/core/types_c.h \
-  /Users/g11m/dev/of/addons/ofxOpenCv/libs/opencv/include/opencv2/core/cvdef.h \
-  /Users/g11m/dev/of/addons/ofxOpenCv/libs/opencv/include/opencv2/core/hal/interface.h \
-  /Users/g11m/dev/of/addons/ofxOpenCv/libs/opencv/include/opencv2/core.hpp \
-  /Users/g11m/dev/of/addons/ofxOpenCv/libs/opencv/include/opencv2/core/version.hpp \
-  /Users/g11m/dev/of/addons/ofxOpenCv/libs/opencv/include/opencv2/core/base.hpp \
-  /Users/g11m/dev/of/addons/ofxOpenCv/libs/opencv/include/opencv2/core/cvstd.hpp \
-  /Users/g11m/dev/of/addons/ofxOpenCv/libs/opencv/include/opencv2/core/ptr.inl.hpp \
-  /Users/g11m/dev/of/addons/ofxOpenCv/libs/opencv/include/opencv2/core/neon_utils.hpp \
-  /Users/g11m/dev/of/addons/ofxOpenCv/libs/opencv/include/opencv2/core/traits.hpp \
-  /Users/g11m/dev/of/addons/ofxOpenCv/libs/opencv/include/opencv2/core/matx.hpp \
-  /Users/g11m/dev/of/addons/ofxOpenCv/libs/opencv/include/opencv2/core/saturate.hpp \
-  /Users/g11m/dev/of/addons/ofxOpenCv/libs/opencv/include/opencv2/core/fast_math.hpp \
-  /Users/g11m/dev/of/addons/ofxOpenCv/libs/opencv/include/opencv2/core/types.hpp \
-  /Users/g11m/dev/of/addons/ofxOpenCv/libs/opencv/include/opencv2/core/mat.hpp \
-  /Users/g11m/dev/of/addons/ofxOpenCv/libs/opencv/include/opencv2/core/bufferpool.hpp \
-  /Users/g11m/dev/of/addons/ofxOpenCv/libs/opencv/include/opencv2/core/mat.inl.hpp \
-  /Users/g11m/dev/of/addons/ofxOpenCv/libs/opencv/include/opencv2/core/persistence.hpp \
-  /Users/g11m/dev/of/addons/ofxOpenCv/libs/opencv/include/opencv2/core/operations.hpp \
-  /Users/g11m/dev/of/addons/ofxOpenCv/libs/opencv/include/opencv2/core/cvstd.inl.hpp \
-  /Users/g11m/dev/of/addons/ofxOpenCv/libs/opencv/include/opencv2/core/utility.hpp \
-  /Users/g11m/dev/of/addons/ofxOpenCv/libs/opencv/include/opencv2/core/optim.hpp \
-  /Users/g11m/dev/of/addons/ofxOpenCv/libs/opencv/include/opencv2/imgproc/imgproc_c.h \
-  /Users/g11m/dev/of/addons/ofxOpenCv/libs/opencv/include/opencv2/imgproc/types_c.h \
-  /Users/g11m/dev/of/addons/ofxOpenCv/libs/opencv/include/opencv2/photo/photo_c.h \
-  /Users/g11m/dev/of/addons/ofxOpenCv/libs/opencv/include/opencv2/video/tracking_c.h \
-  /Users/g11m/dev/of/addons/ofxOpenCv/libs/opencv/include/opencv2/objdetect/objdetect_c.h \
-  /Users/g11m/dev/of/addons/ofxOpenCv/src/ofxCvImage.h \
-  /Users/g11m/dev/of/addons/ofxOpenCv/src/ofxCvGrayscaleImage.h \
-  /Users/g11m/dev/of/addons/ofxOpenCv/src/ofxCvBlob.h \
-  /Users/g11m/dev/of/addons/ofxOpenCv/src/ofxCvColorImage.h \
-  /Users/g11m/dev/of/addons/ofxOpenCv/src/ofxCvFloatImage.h \
-  /Users/g11m/dev/of/addons/ofxOpenCv/src/ofxCvShortImage.h \
-  /Users/g11m/dev/of/addons/ofxOpenCv/src/ofxCvContourFinder.h \
-  /Users/g11m/dev/of/addons/ofxOpenCv/src/ofxCvHaarFinder.h \
-  /Users/g11m/dev/of/addons/ofxKinect/src/ofxKinect.h \
-  /Users/g11m/dev/of/addons/ofxKinect/libs/libfreenect/include/libfreenect.h \
-  /Users/g11m/dev/of/addons/ofxKinect/libs/libusb/include/libusb.h \
-  /Users/g11m/dev/of/addons/ofxKinect/src/ofxBase3DVideo.h \
-  /Users/g11m/dev/of/addons/ofxVideoRecorder/src/ofxVideoRecorder.h \
-  /Users/g11m/dev/of/addons/ofxPoco/libs/poco/include/Poco/Condition.h \
-  /Users/g11m/dev/of/addons/ofxPoco/libs/poco/include/Poco/Foundation.h \
-  /Users/g11m/dev/of/addons/ofxPoco/libs/poco/include/Poco/Config.h \
-  /Users/g11m/dev/of/addons/ofxPoco/libs/poco/include/Poco/Platform.h \
-  /Users/g11m/dev/of/addons/ofxPoco/libs/poco/include/Poco/Platform_POSIX.h \
-  /Users/g11m/dev/of/addons/ofxPoco/libs/poco/include/Poco/Alignment.h \
-  /Users/g11m/dev/of/addons/ofxPoco/libs/poco/include/Poco/Bugcheck.h \
-  /Users/g11m/dev/of/addons/ofxPoco/libs/poco/include/Poco/Types.h \
-  /Users/g11m/dev/of/addons/ofxPoco/libs/poco/include/Poco/Mutex.h \
-  /Users/g11m/dev/of/addons/ofxPoco/libs/poco/include/Poco/Exception.h \
-  /Users/g11m/dev/of/addons/ofxPoco/libs/poco/include/Poco/ScopedLock.h \
-  /Users/g11m/dev/of/addons/ofxPoco/libs/poco/include/Poco/Mutex_POSIX.h \
-  /Users/g11m/dev/of/addons/ofxPoco/libs/poco/include/Poco/ScopedUnlock.h \
-  /Users/g11m/dev/of/addons/ofxPoco/libs/poco/include/Poco/Event.h \
-  /Users/g11m/dev/of/addons/ofxPoco/libs/poco/include/Poco/Event_POSIX.h \
   /Users/g11m/dev/of/apps/myApps/LaCambraCam/src/ofxPointCloud.h \
-  /Users/g11m/dev/of/apps/myApps/LaCambraCam/src/ofxPointsStorer.h \
-  /Users/g11m/dev/of/apps/myApps/LaCambraCam/src/ofxPointsStorerPool.h
+  /Users/g11m/dev/of/apps/myApps/LaCambraCam/src/ofxPointsStorer.h
 
-/Users/g11m/dev/of/apps/myApps/LaCambraCam/src/ofApp.h:
+/Users/g11m/dev/of/apps/myApps/LaCambraCam/src/ofxPointsStorerPool.h:
 
 /Users/g11m/dev/of/libs/openFrameworks/ofMain.h:
 
@@ -2529,126 +2469,6 @@ obj/osx/Release/src/main.o: \
 
 /Users/g11m/dev/of/libs/openFrameworks/3d/ofEasyCam.h:
 
-/Users/g11m/dev/of/addons/ofxOpenCv/src/ofxOpenCv.h:
-
-/Users/g11m/dev/of/addons/ofxOpenCv/src/ofxCvConstants.h:
-
-/Users/g11m/dev/of/addons/ofxOpenCv/libs/opencv/include/opencv/cv.h:
-
-/Users/g11m/dev/of/addons/ofxOpenCv/libs/opencv/include/opencv2/core/core_c.h:
-
-/Users/g11m/dev/of/addons/ofxOpenCv/libs/opencv/include/opencv2/core/types_c.h:
-
-/Users/g11m/dev/of/addons/ofxOpenCv/libs/opencv/include/opencv2/core/cvdef.h:
-
-/Users/g11m/dev/of/addons/ofxOpenCv/libs/opencv/include/opencv2/core/hal/interface.h:
-
-/Users/g11m/dev/of/addons/ofxOpenCv/libs/opencv/include/opencv2/core.hpp:
-
-/Users/g11m/dev/of/addons/ofxOpenCv/libs/opencv/include/opencv2/core/version.hpp:
-
-/Users/g11m/dev/of/addons/ofxOpenCv/libs/opencv/include/opencv2/core/base.hpp:
-
-/Users/g11m/dev/of/addons/ofxOpenCv/libs/opencv/include/opencv2/core/cvstd.hpp:
-
-/Users/g11m/dev/of/addons/ofxOpenCv/libs/opencv/include/opencv2/core/ptr.inl.hpp:
-
-/Users/g11m/dev/of/addons/ofxOpenCv/libs/opencv/include/opencv2/core/neon_utils.hpp:
-
-/Users/g11m/dev/of/addons/ofxOpenCv/libs/opencv/include/opencv2/core/traits.hpp:
-
-/Users/g11m/dev/of/addons/ofxOpenCv/libs/opencv/include/opencv2/core/matx.hpp:
-
-/Users/g11m/dev/of/addons/ofxOpenCv/libs/opencv/include/opencv2/core/saturate.hpp:
-
-/Users/g11m/dev/of/addons/ofxOpenCv/libs/opencv/include/opencv2/core/fast_math.hpp:
-
-/Users/g11m/dev/of/addons/ofxOpenCv/libs/opencv/include/opencv2/core/types.hpp:
-
-/Users/g11m/dev/of/addons/ofxOpenCv/libs/opencv/include/opencv2/core/mat.hpp:
-
-/Users/g11m/dev/of/addons/ofxOpenCv/libs/opencv/include/opencv2/core/bufferpool.hpp:
-
-/Users/g11m/dev/of/addons/ofxOpenCv/libs/opencv/include/opencv2/core/mat.inl.hpp:
-
-/Users/g11m/dev/of/addons/ofxOpenCv/libs/opencv/include/opencv2/core/persistence.hpp:
-
-/Users/g11m/dev/of/addons/ofxOpenCv/libs/opencv/include/opencv2/core/operations.hpp:
-
-/Users/g11m/dev/of/addons/ofxOpenCv/libs/opencv/include/opencv2/core/cvstd.inl.hpp:
-
-/Users/g11m/dev/of/addons/ofxOpenCv/libs/opencv/include/opencv2/core/utility.hpp:
-
-/Users/g11m/dev/of/addons/ofxOpenCv/libs/opencv/include/opencv2/core/optim.hpp:
-
-/Users/g11m/dev/of/addons/ofxOpenCv/libs/opencv/include/opencv2/imgproc/imgproc_c.h:
-
-/Users/g11m/dev/of/addons/ofxOpenCv/libs/opencv/include/opencv2/imgproc/types_c.h:
-
-/Users/g11m/dev/of/addons/ofxOpenCv/libs/opencv/include/opencv2/photo/photo_c.h:
-
-/Users/g11m/dev/of/addons/ofxOpenCv/libs/opencv/include/opencv2/video/tracking_c.h:
-
-/Users/g11m/dev/of/addons/ofxOpenCv/libs/opencv/include/opencv2/objdetect/objdetect_c.h:
-
-/Users/g11m/dev/of/addons/ofxOpenCv/src/ofxCvImage.h:
-
-/Users/g11m/dev/of/addons/ofxOpenCv/src/ofxCvGrayscaleImage.h:
-
-/Users/g11m/dev/of/addons/ofxOpenCv/src/ofxCvBlob.h:
-
-/Users/g11m/dev/of/addons/ofxOpenCv/src/ofxCvColorImage.h:
-
-/Users/g11m/dev/of/addons/ofxOpenCv/src/ofxCvFloatImage.h:
-
-/Users/g11m/dev/of/addons/ofxOpenCv/src/ofxCvShortImage.h:
-
-/Users/g11m/dev/of/addons/ofxOpenCv/src/ofxCvContourFinder.h:
-
-/Users/g11m/dev/of/addons/ofxOpenCv/src/ofxCvHaarFinder.h:
-
-/Users/g11m/dev/of/addons/ofxKinect/src/ofxKinect.h:
-
-/Users/g11m/dev/of/addons/ofxKinect/libs/libfreenect/include/libfreenect.h:
-
-/Users/g11m/dev/of/addons/ofxKinect/libs/libusb/include/libusb.h:
-
-/Users/g11m/dev/of/addons/ofxKinect/src/ofxBase3DVideo.h:
-
-/Users/g11m/dev/of/addons/ofxVideoRecorder/src/ofxVideoRecorder.h:
-
-/Users/g11m/dev/of/addons/ofxPoco/libs/poco/include/Poco/Condition.h:
-
-/Users/g11m/dev/of/addons/ofxPoco/libs/poco/include/Poco/Foundation.h:
-
-/Users/g11m/dev/of/addons/ofxPoco/libs/poco/include/Poco/Config.h:
-
-/Users/g11m/dev/of/addons/ofxPoco/libs/poco/include/Poco/Platform.h:
-
-/Users/g11m/dev/of/addons/ofxPoco/libs/poco/include/Poco/Platform_POSIX.h:
-
-/Users/g11m/dev/of/addons/ofxPoco/libs/poco/include/Poco/Alignment.h:
-
-/Users/g11m/dev/of/addons/ofxPoco/libs/poco/include/Poco/Bugcheck.h:
-
-/Users/g11m/dev/of/addons/ofxPoco/libs/poco/include/Poco/Types.h:
-
-/Users/g11m/dev/of/addons/ofxPoco/libs/poco/include/Poco/Mutex.h:
-
-/Users/g11m/dev/of/addons/ofxPoco/libs/poco/include/Poco/Exception.h:
-
-/Users/g11m/dev/of/addons/ofxPoco/libs/poco/include/Poco/ScopedLock.h:
-
-/Users/g11m/dev/of/addons/ofxPoco/libs/poco/include/Poco/Mutex_POSIX.h:
-
-/Users/g11m/dev/of/addons/ofxPoco/libs/poco/include/Poco/ScopedUnlock.h:
-
-/Users/g11m/dev/of/addons/ofxPoco/libs/poco/include/Poco/Event.h:
-
-/Users/g11m/dev/of/addons/ofxPoco/libs/poco/include/Poco/Event_POSIX.h:
-
 /Users/g11m/dev/of/apps/myApps/LaCambraCam/src/ofxPointCloud.h:
 
 /Users/g11m/dev/of/apps/myApps/LaCambraCam/src/ofxPointsStorer.h:
-
-/Users/g11m/dev/of/apps/myApps/LaCambraCam/src/ofxPointsStorerPool.h:

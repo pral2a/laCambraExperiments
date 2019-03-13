@@ -5,7 +5,8 @@
 #include "ofxKinect.h"
 #include "ofxVideoRecorder.h"
 #include "ofxPointCloud.h"
-#include "ofxBinaryMesh.h"
+#include "ofxPointsStorer.h"
+#include "ofxPointsStorerPool.h"
 
 // Windows users:
 // You MUST install the libfreenect kinect drivers in order to be able to use
@@ -89,9 +90,6 @@ public:
     void stopRecord();
     void recordFilm();
     void recordingComplete(ofxVideoRecorderOutputFileCompleteEventArgs& args);
-   
-   	int const totalWorkers = 20;
-	ofSaveWorker W[20];  
 
     void createTakeDirectory();
 
@@ -109,5 +107,7 @@ public:
     long previousFolderCheckTime;
 
     int frameTime;
+
+    ofPointsStorerPool pointsStorers;
 
 };

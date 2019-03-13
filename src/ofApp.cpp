@@ -61,13 +61,7 @@ void ofApp::setup() {
 	frameNumber = 0;
 	frameNumberSent = 0;
 
-	for(int i = 0; i < totalWorkers; i++){
-		ofSaveWorker W[i];
-	}
-
-	for(int i = 0; i < totalWorkers; i++){
-		W[i].startThread();
-	}
+	pointsStorers.start();
     	
 	previousFrameTime = 0;
 	previousSavedFrameTime = 0;
@@ -197,7 +191,7 @@ void ofApp::drawPointCloud() {
 			char fileName[20];
 			sprintf(fileName,"pc-%06d.ply",frameNumber);
 			string pointPath = fixPath + "/points/" + fileName;
-		    ofxBinaryMesh::load(pointPath, pointCloud);
+		    // ofxBinaryMesh::load(pointPath, pointCloud);
 			// pointCloud.load(pointPath);
 		}
 	} else {
@@ -222,8 +216,8 @@ void ofApp::drawPointCloud() {
             	sprintf(fileName,"pc-%06d.ply",frameNumberSent);
             	string pointPath = pointsDirPath + fileName;
 				pointCloud.setSavePath(pointPath);
-				int worker = frameNumberSent % totalWorkers;
-				W[worker].pointsSaver.send(pointCloud);
+				pointCloud.setFrameNumber(frameNumberSent);
+				pointsStorers.saveRaw(pointCloud);
 				frameNumberSent++;
 			}
 		} 
@@ -275,10 +269,7 @@ void ofApp::exit() {
 	kinect.setCameraTiltAngle(0); // zero the tilt on exit
 	kinect.close();
 	stopRecord();
-	for(int i = 0; i < totalWorkers; i++){
-		W[i].pointsSaver.close();
-		W[i].waitForThread(true);
-	}
+	pointsStorers.stop();
 }
 
 //--------------------------------------------------------------

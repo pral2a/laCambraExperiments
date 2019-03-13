@@ -1,43 +1,23 @@
-#include "ofMesh.h"
-#include "ofLog.h"
-#include "ofxBinaryMesh.h"
+#pragma once
+
+#include "ofMain.h"
 
 class ofPointCloud : public ofMesh {
-    
-    public:
+
+    private:
 
     string path;
-
-    void setSavePath(string _path){
-        path = _path;
-    }    
-
-    string getSavePath(){
-        return path;
-    }
-
-    // void save(const std::filesystem::path& path, bool useBinary = false){
-    //     ofLogWarning("ofPointCloud") << "hello: " << meshNumber;
-    // }
-
-    // private:
-
-
-};
-
-class ofSaveWorker : public ofThread {
+    int frameNumber;
     
     public:
 
-    ofThreadChannel<ofPointCloud> pointsSaver;
+    void setFrameNumber(int _frameNumber);
+    int getFrameNumber();
 
-    void threadedFunction() {
-        ofPointCloud pointCloud;
-        while(pointsSaver.receive(pointCloud)){
-            ofxBinaryMesh::save(pointCloud.getSavePath(), pointCloud);
-            // pointCloud.save(pointCloud.getSavePath());
-        }
-    }
+    void setSavePath(string _path);
+    string getSavePath();
 
+    void saveRaw();
+    bool loadRaw(const string& _path);
 
 };
