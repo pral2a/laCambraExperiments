@@ -108,6 +108,8 @@ public:
     long previousSavedFrameTime;
     long previousFolderCheckTime;
 
+    bool bReplayPause;
+
     int frameTime;
 
 };

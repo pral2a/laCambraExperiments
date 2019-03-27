@@ -10,7 +10,7 @@ void ofApp::setup() {
 	//ofSetLogLevel(OF_LOG_VERBOSE);
 	ofSetLogLevel(OF_LOG_SILENT);
 	
-	bProxyMode = true;
+	bProxyMode = false;
 
 	if(!bProxyMode) {
 		vidRecorder.setVideoCodec("prores");
@@ -45,10 +45,11 @@ void ofApp::setup() {
 	bDrawWireframe = false;
 	bDrawFaces = false;
 	bViewOrbit = false;
+	bReplayPause = true;
 
 	ofSetFrameRate(60);
 
-	int frameTime = 1000/30;
+	int frameTime = 1000/60;
 
 	// zero the tilt on startup
 	kinect.setCameraTiltAngle(0);
@@ -90,6 +91,11 @@ void ofApp::update() {
 	kinect.update();
 
 	if(kinect.isFrameNew()) {
+		recordFilm();
+	}
+
+
+	if(bReplay) {
 		recordFilm();
 	}
 
@@ -189,16 +195,16 @@ void ofApp::drawPointCloud() {
 	pointCloud.setMode(meshMode());
 
 	if(bReplay) {
-		// TODO: Framerate needs to increase every 1/30 seconds
 		long now = ofGetElapsedTimeMillis();
 		if(now - previousFrameTime >= frameTime) {
 			previousFrameTime = ofGetElapsedTimeMillis();
-			frameNumber++;
+			if (!bReplayPause) {
+				frameNumber++;
+			}
 			char fileName[20];
 			sprintf(fileName,"pc-%06d.ply",frameNumber);
 			string pointPath = fixPath + "/points/" + fileName;
 		    ofxBinaryMesh::load(pointPath, pointCloud);
-			// pointCloud.load(pointPath);
 		}
 	} else {
 		if (stepRes < 2) stepRes = 2;
@@ -293,12 +299,18 @@ void ofApp::startRecord() {
 			ofLogNotice() << "Recording!";
 			kinect.setLed(ofxKinect::LED_BLINK_GREEN);
 			string videoRecordingName;
-			if (bProxyMode) {
-				videoRecordingName = "proxy-"+ofGetTimestampString()+".mov";
-			} else {
-				videoRecordingName = ofGetTimestampString()+".mov";
-			}
-			string videoRecordingPath = takeDirPath + videoRecordingName;
+			string videoRecordingPath;
+			if (bReplay) {
+				videoRecordingName = "export-"+ofGetTimestampString()+".mov";
+				videoRecordingPath = fixPath + '/' + videoRecordingName;
+		    } else {
+				if (bProxyMode) {
+					videoRecordingName = "proxy-"+ofGetTimestampString()+".mov";
+				} else {
+					videoRecordingName = ofGetTimestampString()+".mov";
+				}
+				videoRecordingPath = takeDirPath + videoRecordingName;
+		    }
 			vidRecorder.setup(videoRecordingPath, film.getWidth(), film.getHeight(), 30);
 			bRecording = true;
 			bEncoding = true;
@@ -368,6 +380,21 @@ void ofApp::loadTake(){
 //--------------------------------------------------------------
 void ofApp::keyPressed (int key) {
 	switch (key) {
+		case ' ':
+			bReplayPause = !bReplayPause;
+			break;
+		case 'x':
+			if(bReplayPause){
+				frameNumber = frameNumber + 30;
+			}
+			break;
+		case 'z':
+			if(bReplayPause){
+				if (frameNumber > 30) {
+					frameNumber = frameNumber - 30;
+				}
+			}
+			break;
 		case 'r':
 			startRecord();
 			break;
