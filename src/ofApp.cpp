@@ -12,13 +12,21 @@ void ofApp::setup() {
 	
 	bProxyMode = false;
 
+	// https://wideopenbokeh.com/AthenasFall/?p=111
+	// https://github.com/timscaffidi/ofxVideoRecorder/issues/47
+	
 	if(!bProxyMode) {
-		vidRecorder.setVideoCodec("prores");
-		film.allocate(2048, 1080, GL_RGB);
+		// vidRecorder.setVideoCodec("prores");
+		film.allocate(2048, 1080, GL_RGBA);
 	} else {
-		vidRecorder.setVideoCodec("prores");
-		film.allocate(1024, 600, GL_RGB);
+		// vidRecorder.setVideoCodec("prores");
+		film.allocate(1024, 600, GL_RGBA);
 	}
+
+	vidRecorder.setVideoCodec("prores_ks");
+	// vidRecorder.setVideoBitrate("20000k");//("800k");
+	vidRecorder.setPixelFormat("rgba"); //"rgb24" for 3 channel rgb video, "rgba" for 4 channel rgba
+	vidRecorder.setOutputPixelFormat("rgba");
 
 	ofAddListener(vidRecorder.outputFileCompleteEvent, this, &ofApp::recordingComplete);
 
@@ -49,7 +57,7 @@ void ofApp::setup() {
 
 	ofSetFrameRate(60);
 
-	int frameTime = 1000/60;
+	int frameTime = 1000/30;
 
 	// zero the tilt on startup
 	kinect.setCameraTiltAngle(0);
@@ -239,7 +247,8 @@ void ofApp::drawPointCloud() {
 		}
 	} 
 
-
+	// Some fun!
+	//pointSize = ofRandom(pointSize -  0.1f,  pointSize + 0.1f);
 	glPointSize(pointSize);
 	ofPushMatrix();
 	ofRotateY(panAngle);
