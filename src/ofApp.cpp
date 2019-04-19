@@ -12,6 +12,9 @@ void ofApp::setup() {
 	
 	bProxyMode = false;
 
+	pointCloud.setMode(meshMode());
+	pointCloudPreLoaded.setMode(meshMode());
+
 	// https://wideopenbokeh.com/AthenasFall/?p=111
 	// https://github.com/timscaffidi/ofxVideoRecorder/issues/47
 	
@@ -24,8 +27,8 @@ void ofApp::setup() {
 	}
 
 	vidRecorder.setVideoCodec("prores_ks");
-	// vidRecorder.setVideoBitrate("20000k");//("800k");
-	vidRecorder.setPixelFormat("rgba"); //"rgb24" for 3 channel rgb video, "rgba" for 4 channel rgba
+	vidRecorder.setVideoBitrate("8000k");
+	vidRecorder.setPixelFormat("rgba");
 	vidRecorder.setOutputPixelFormat("rgba");
 
 	ofAddListener(vidRecorder.outputFileCompleteEvent, this, &ofApp::recordingComplete);
@@ -38,8 +41,6 @@ void ofApp::setup() {
 	kinect.setRegistration(true);
 
 	kinect.init();
-	//kinect.init(true); // shows infrared instead of RGB video image
-	//kinect.init(false, false); // disable video image (faster fps)
 
 	kinect.open();      // opens first available kinect
 
@@ -54,10 +55,13 @@ void ofApp::setup() {
 	bDrawFaces = false;
 	bViewOrbit = false;
 	bReplayPause = true;
+	bNewFrame = false;
 
 	ofSetFrameRate(60);
 
-	int frameTime = 1000/30;
+	int playbackFrameRate = 30;
+
+	frameTime = 1000/playbackFrameRate;
 
 	// zero the tilt on startup
 	kinect.setCameraTiltAngle(0);
@@ -68,6 +72,7 @@ void ofApp::setup() {
 	pointSize = 3.0;
 	stepRes = 2;
 	frameNumber = 0;
+	frameLoaded = 0;
 	frameNumberSent = 0;
 
 	for(int i = 0; i < totalWorkers; i++){
@@ -198,23 +203,36 @@ void ofApp::recordingComplete(ofxVideoRecorderOutputFileCompleteEventArgs& args)
 void ofApp::drawPointCloud() {
 	int w = 640;
 	int h = 480;
-	ofPointCloud pointCloud;
 
-	pointCloud.setMode(meshMode());
 
 	if(bReplay) {
 		long now = ofGetElapsedTimeMillis();
-		if(now - previousFrameTime >= frameTime) {
+
+		if (frameNumber == frameLoaded) {
+			int nextFrame = frameNumber + 1;
+			char fileName[20];
+			sprintf(fileName,"pc-%06d.ply", nextFrame);
+			string pointPath = fixPath + "/points/" + fileName;
+		    ofxBinaryMesh::load(pointPath, pointCloudPreLoaded);
+		    frameLoaded = nextFrame;
+		    ofLogNotice() << "FrameLoaded!";
+		}
+
+		long enlapsedFrameTime = now - previousFrameTime;
+
+		if(enlapsedFrameTime >= frameTime) {
+			previousEnlapsedFrameTime = enlapsedFrameTime;
 			previousFrameTime = ofGetElapsedTimeMillis();
 			if (!bReplayPause) {
 				frameNumber++;
 			}
-			char fileName[20];
-			sprintf(fileName,"pc-%06d.ply",frameNumber);
-			string pointPath = fixPath + "/points/" + fileName;
-		    ofxBinaryMesh::load(pointPath, pointCloud);
+			pointCloud = pointCloudPreLoaded;
+		    ofLogNotice() << "FramePlayed!";
+
 		}
+
 	} else {
+
 		if (stepRes < 2) stepRes = 2;
 		int step = stepRes;
 		for(int y = 0; y < h; y += step) {
@@ -276,7 +294,6 @@ ofPrimitiveMode ofApp::meshMode(){
 }
 
 void ofApp::drawFilm(){
-	// film.clear();
 	film.begin();
 	ofClear(0,0,0,0);  	// ofBackground(0, 0, 0);
 	easyCam.begin();
@@ -396,12 +413,14 @@ void ofApp::keyPressed (int key) {
 		case 'x':
 			if(bReplayPause){
 				frameNumber = frameNumber + 30;
+				frameLoaded = frameNumber;
 			}
 			break;
 		case 'z':
 			if(bReplayPause){
 				if (frameNumber > 30) {
 					frameNumber = frameNumber - 30;
+					frameLoaded = frameNumber;
 				}
 			}
 			break;
@@ -475,10 +494,19 @@ void ofApp::drawInstructions() {
 	stringstream reportStream;
 
 	reportStream << " " << endl;
+
+	int vidSaved = (vidRecorder.getNumVideoFramesRecorded() >= vidRecorder.getVideoQueueSize() ? vidRecorder.getNumVideoFramesRecorded() - vidRecorder.getVideoQueueSize(): 0 );
+
 	if(!bRecording && (bEncoding || bWrittingPoints)) {
-		int p = round(((float) frameNumber / (float) frameNumberSent)*100);
+
+		int remainingPercent = round(((float) frameNumber / (float) frameNumberSent)*100);
+
+		if (remainingPercent < 0) {
+			remainingPercent = round(((float) vidSaved / (float) vidRecorder.getNumVideoFramesRecorded())*100);
+		}
+
 		reportStream << ">> Take: " << takeName << endl;
-		reportStream << "  Wait! " << p << "%" << " encoding complete" << endl;
+		reportStream << "  Wait! " << remainingPercent << "%" << " encoding complete" << endl;
 		reportStream << " " << endl;
 	} else if (bRecording) {
 		reportStream << ">> Take: " << takeName << endl;
@@ -499,8 +527,19 @@ void ofApp::drawInstructions() {
 	reportStream << " " << endl;
 	reportStream << " " << endl;
 
-	reportStream << "# Frames" << endl;
+	reportStream << "# Perf" << endl;
 	reportStream << "  FPS: " << round(ofGetFrameRate()) << endl;
+
+	if (bReplay) {
+		float playbackPerf = ((float) previousEnlapsedFrameTime / (float) frameTime);
+		reportStream << "  P: " << playbackPerf << endl;
+		if (playbackPerf > 1.1) {
+			reportStream << "  Jitter!" << endl;
+		} else {
+			reportStream << "  " << endl;
+		}
+	}
+
 	reportStream << " " << endl;
 	
 	reportStream << "# Points" << endl;
@@ -512,7 +551,7 @@ void ofApp::drawInstructions() {
 	reportStream << "# Video" << endl;
 	reportStream << "  Total: " << vidRecorder.getNumVideoFramesRecorded() << endl;
 	reportStream << "  Pending: " << vidRecorder.getVideoQueueSize() << endl;
-	reportStream << "  Saved: " << (vidRecorder.getNumVideoFramesRecorded() >= vidRecorder.getVideoQueueSize() ? vidRecorder.getNumVideoFramesRecorded() - vidRecorder.getVideoQueueSize(): 0 ) << endl;
+	reportStream << "  Saved: " << vidSaved << endl;
 	reportStream << "  Mode: " << (bProxyMode?"proxy":"full") << endl;
 	reportStream << "  Resolution: " << film.getWidth() << "x" << film.getHeight() << endl;
 	reportStream << "  Codec: " << "Apple ProRes" << endl;

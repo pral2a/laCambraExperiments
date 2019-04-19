@@ -69,10 +69,14 @@ public:
 
 	int frameNumber;
 	int frameNumberSent;
+	int frameLoaded;
 
 	long lastSavedFrame;
-	
-	// used for viewing the point cloud
+
+	ofPointCloud pointCloud;
+	ofPointCloud pointCloudPreLoaded;
+
+
 	ofEasyCam easyCam;
     
     ofxVideoRecorder vidRecorder;
@@ -107,6 +111,9 @@ public:
     long previousFrameTime;
     long previousSavedFrameTime;
     long previousFolderCheckTime;
+	long previousEnlapsedFrameTime;
+
+	bool bNewFrame;
 
     bool bReplayPause;
 
