@@ -59,6 +59,7 @@ void ofApp::setup() {
 
 	ofSetFrameRate(60);
 
+
 	int playbackFrameRate = 30;
 
 	frameTime = 1000/playbackFrameRate;
