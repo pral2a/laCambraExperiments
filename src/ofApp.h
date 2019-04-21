@@ -6,6 +6,8 @@
 #include "ofxVideoRecorder.h"
 #include "ofxPointCloud.h"
 #include "ofxBinaryMesh.h"
+#include "ofxBinaryMesh.h"
+#include "ofxKorgNanoKontrol.h"
 
 // Windows users:
 // You MUST install the libfreenect kinect drivers in order to be able to use
@@ -125,5 +127,9 @@ public:
     int frameCompensation;
 
     int frameThing;
+
+    ofxKorgNanoKontrol nano;
+
+    bool bKontrol;
 
 };

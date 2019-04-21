@@ -106,10 +106,26 @@ void ofApp::setup() {
 	easyCam.disableOrtho();
 	easyCam.setFov(100);
 
+	bKontrol = true;
+
+    nano.setup();
+    
+
 }
 
 //--------------------------------------------------------------
 void ofApp::update() {
+
+
+
+	if (bKontrol) {
+		easyCam.setDistance(ofMap(nano.getVal(K_SLIDER_3),0,127,0,1000));
+		easyCam.setPosition(ofMap(nano.getVal(K_SLIDER_4),0,127,-300,300), easyCam.getY(), easyCam.getZ());
+		easyCam.setPosition(easyCam.getX(), ofMap(nano.getVal(K_SLIDER_5),0,127,-300,300), easyCam.getZ());
+		easyCam.setFov(ofMap(nano.getVal(K_SLIDER_6),0,127, 28, 200));
+		pointSize = ofMap(nano.getVal(K_SLIDER_7),0,127,0,30);
+	}
+
 
 	// kinect.update();
 
@@ -509,7 +525,8 @@ void ofApp::keyPressed (int key) {
 			stepRes++;
 			break;
 		case 'k':
-			stepRes--;
+			bKontrol = !bKontrol;
+			//stepRes--;
 			break;
 		case 'n':
 			loadTake();
@@ -523,6 +540,7 @@ void ofApp::keyPressed (int key) {
 			pointSize = 3.0;
 			stepRes = 2;
 			easyCam.reset();
+			easyCam.setFov(100);
 			break;
 		case OF_KEY_RIGHT:
 			easyCam.setPosition(easyCam.getX() + 0.100f, easyCam.getY(), easyCam.getZ());
@@ -642,9 +660,12 @@ void ofApp::drawInstructions() {
 	reportStream << " " << endl;
 	reportStream << " " << endl;
 	reportStream << "# Controls" << endl;
+
+	reportStream << " [r]/[s] record / stop" << endl;
+
 	reportStream << " [r]/[s] record / stop" << endl;
 	reportStream << " [p]/[l] point size: "  << pointSize << endl;
-	reportStream << " [o]/[k] point size: " << stepRes << endl;
+	reportStream << " [o]/[c] point size: " << stepRes << endl;
 	reportStream << " [<]/[>] pan angle: " << panAngle << endl;
 	reportStream << " [up]/[dn] tilt angle: " << tiltAngle << endl;
 	reportStream << " [v] prev real size" << endl;

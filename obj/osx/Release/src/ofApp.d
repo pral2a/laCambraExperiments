@@ -882,7 +882,22 @@ obj/osx/Release/src/ofApp.o: \
   /Users/g11m/dev/of/addons/ofxPoco/libs/poco/include/Poco/Event.h \
   /Users/g11m/dev/of/addons/ofxPoco/libs/poco/include/Poco/Event_POSIX.h \
   /Users/g11m/dev/of/apps/myApps/LaCambraCam/src/ofxPointCloud.h \
-  /Users/g11m/dev/of/apps/myApps/LaCambraCam/src/ofxBinaryMesh.h
+  /Users/g11m/dev/of/apps/myApps/LaCambraCam/src/ofxBinaryMesh.h \
+  /Users/g11m/dev/of/apps/myApps/LaCambraCam/src/ofxKorgNanoKontrol.h \
+  /Users/g11m/dev/of/addons/ofxMidi/src/ofxMidi.h \
+  /Users/g11m/dev/of/addons/ofxMidi/src/ofxMidiIn.h \
+  /Users/g11m/dev/of/addons/ofxMidi/src/ofxBaseMidi.h \
+  /Users/g11m/dev/of/addons/ofxMidi/src/ofxMidiConstants.h \
+  /Users/g11m/dev/of/addons/ofxMidi/src/ofxMidiMessage.h \
+  /Users/g11m/dev/of/addons/ofxMidi/src/ofxMidiTypes.h \
+  /Users/g11m/dev/of/addons/ofxMidi/src/desktop/ofxRtMidiIn.h \
+  /Users/g11m/dev/of/addons/ofxMidi/libs/rtmidi/RtMidi.h \
+  /Users/g11m/dev/of/addons/ofxMidi/src/desktop/../ofxBaseMidi.h \
+  /Users/g11m/dev/of/addons/ofxMidi/src/ofxMidiOut.h \
+  /Users/g11m/dev/of/addons/ofxMidi/src/desktop/ofxRtMidiOut.h \
+  /Users/g11m/dev/of/addons/ofxMidi/src/ofxMidiClock.h \
+  /Users/g11m/dev/of/addons/ofxMidi/src/ofxMidiTimecode.h \
+  /Users/g11m/dev/of/apps/myApps/LaCambraCam/src/ofxKorgNanoKontrolConstants.h
 
 /Users/g11m/dev/of/apps/myApps/LaCambraCam/src/ofApp.h:
 
@@ -2649,3 +2664,33 @@ obj/osx/Release/src/ofApp.o: \
 /Users/g11m/dev/of/apps/myApps/LaCambraCam/src/ofxPointCloud.h:
 
 /Users/g11m/dev/of/apps/myApps/LaCambraCam/src/ofxBinaryMesh.h:
+
+/Users/g11m/dev/of/apps/myApps/LaCambraCam/src/ofxKorgNanoKontrol.h:
+
+/Users/g11m/dev/of/addons/ofxMidi/src/ofxMidi.h:
+
+/Users/g11m/dev/of/addons/ofxMidi/src/ofxMidiIn.h:
+
+/Users/g11m/dev/of/addons/ofxMidi/src/ofxBaseMidi.h:
+
+/Users/g11m/dev/of/addons/ofxMidi/src/ofxMidiConstants.h:
+
+/Users/g11m/dev/of/addons/ofxMidi/src/ofxMidiMessage.h:
+
+/Users/g11m/dev/of/addons/ofxMidi/src/ofxMidiTypes.h:
+
+/Users/g11m/dev/of/addons/ofxMidi/src/desktop/ofxRtMidiIn.h:
+
+/Users/g11m/dev/of/addons/ofxMidi/libs/rtmidi/RtMidi.h:
+
+/Users/g11m/dev/of/addons/ofxMidi/src/desktop/../ofxBaseMidi.h:
+
+/Users/g11m/dev/of/addons/ofxMidi/src/ofxMidiOut.h:
+
+/Users/g11m/dev/of/addons/ofxMidi/src/desktop/ofxRtMidiOut.h:
+
+/Users/g11m/dev/of/addons/ofxMidi/src/ofxMidiClock.h:
+
+/Users/g11m/dev/of/addons/ofxMidi/src/ofxMidiTimecode.h:
+
+/Users/g11m/dev/of/apps/myApps/LaCambraCam/src/ofxKorgNanoKontrolConstants.h:
