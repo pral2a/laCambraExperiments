@@ -119,4 +119,10 @@ public:
 
     int frameTime;
 
+    bool t;
+
+    int frameCompensation;
+
+    int frameThing;
+
 };

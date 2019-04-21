@@ -7,8 +7,8 @@
 
 //--------------------------------------------------------------
 void ofApp::setup() {
-	//ofSetLogLevel(OF_LOG_VERBOSE);
-	ofSetLogLevel(OF_LOG_SILENT);
+	ofSetLogLevel(OF_LOG_VERBOSE);
+	//ofSetLogLevel(OF_LOG_SILENT);
 	
 	bProxyMode = false;
 
@@ -62,7 +62,7 @@ void ofApp::setup() {
 
 	int playbackFrameRate = 30;
 
-	frameTime = 1000/playbackFrameRate;
+	frameTime = 1000000/playbackFrameRate;
 
 	// zero the tilt on startup
 	kinect.setCameraTiltAngle(0);
@@ -87,6 +87,8 @@ void ofApp::setup() {
 	previousFrameTime = 0;
 	previousSavedFrameTime = 0;
 	previousFolderCheckTime = 0;
+	previousEnlapsedFrameTime = frameTime;
+	frameCompensation = 0;
 
 	ofFileDialogResult result = ofSystemLoadDialog("Select project folder", true);
 		
@@ -97,16 +99,18 @@ void ofApp::setup() {
 
 	kinect.setLed(ofxKinect::LED_GREEN);
 
+	frameThing = 0;
+
 }
 
 //--------------------------------------------------------------
 void ofApp::update() {
 
-	kinect.update();
+	// kinect.update();
 
-	if(kinect.isFrameNew()) {
-		recordFilm();
-	}
+	// if(kinect.isFrameNew()) {
+	// 	recordFilm();
+	// }
 
 
 	if(bReplay) {
@@ -136,6 +140,7 @@ void ofApp::update() {
 
 //--------------------------------------------------------------
 void ofApp::draw() {
+
 	ofBackground(0, 0, 0);
 	ofSetColor(255, 255, 255);
 
@@ -205,9 +210,12 @@ void ofApp::drawPointCloud() {
 	int w = 640;
 	int h = 480;
 
+	frameThing++;
 
 	if(bReplay) {
-		long now = ofGetElapsedTimeMillis();
+
+		string fl = "";
+		string fp = "";
 
 		if (frameNumber == frameLoaded) {
 			int nextFrame = frameNumber + 1;
@@ -216,21 +224,36 @@ void ofApp::drawPointCloud() {
 			string pointPath = fixPath + "/points/" + fileName;
 		    ofxBinaryMesh::load(pointPath, pointCloudPreLoaded);
 		    frameLoaded = nextFrame;
-		    ofLogNotice() << "FrameLoaded!";
-		}
+			fl = "FrameLoaded";
+		    // ofLogNotice() << "FrameLoaded!";
+		} 
 
-		long enlapsedFrameTime = now - previousFrameTime;
+		long enlapsedFrameTime = ofGetElapsedTimeMicros() - previousFrameTime;
 
-		if(enlapsedFrameTime >= frameTime) {
+		long dynamicFrameTime = frameTime - frameCompensation;
+
+		ofLogNotice() << frameThing << '\t' << round(ofGetFrameRate()) / 30 << '\t' << ofGetFrameRate();
+
+
+		if(frameThing >= round(ofGetFrameRate()) / 30) {
+
+			frameThing = 0;
+
 			previousEnlapsedFrameTime = enlapsedFrameTime;
-			previousFrameTime = ofGetElapsedTimeMillis();
+			previousFrameTime = ofGetElapsedTimeMicros();
 			if (!bReplayPause) {
 				frameNumber++;
 			}
 			pointCloud = pointCloudPreLoaded;
-		    ofLogNotice() << "FramePlayed!";
+			fp = "FramePlayed";
+		    // ofLogNotice() << "FramePlayed!";
 
 		}
+
+
+
+		ofLogNotice() << enlapsedFrameTime << '\t' << dynamicFrameTime << '\t' << previousEnlapsedFrameTime  << '\t' << fl << '\t' << fp;
+
 
 	} else {
 
@@ -247,9 +270,9 @@ void ofApp::drawPointCloud() {
 
 
 		if(bRecording) {
-			long now = ofGetElapsedTimeMillis();
+			long now = ofGetElapsedTimeMicros();
 			if(now - previousFrameTime >= frameTime) {
-				previousFrameTime = ofGetElapsedTimeMillis();
+				previousFrameTime = ofGetElapsedTimeMicros();
 				bWrittingPoints = true;
             	char fileName[20];
             	sprintf(fileName,"pc-%06d.ply",frameNumberSent);
@@ -479,10 +502,12 @@ void ofApp::keyPressed (int key) {
 			panAngle -= 0.100f;
 			break;
 		case OF_KEY_UP:
-			tiltAngle += 1.500f;
+			frameCompensation += 50;
+			//tiltAngle += 1.500f;
 			break;
 		case OF_KEY_DOWN:
-			tiltAngle -= 1.500f;
+			frameCompensation -= 50;
+			//tiltAngle -= 1.500f;
 			break;
 		}
 }
@@ -534,7 +559,7 @@ void ofApp::drawInstructions() {
 	if (bReplay) {
 		float playbackPerf = ((float) previousEnlapsedFrameTime / (float) frameTime);
 		reportStream << "  P: " << playbackPerf << endl;
-		if (playbackPerf > 1.1) {
+		if (playbackPerf > 1) {
 			reportStream << "  Jitter!" << endl;
 		} else {
 			reportStream << "  " << endl;
@@ -558,13 +583,13 @@ void ofApp::drawInstructions() {
 	reportStream << "  Codec: " << "Apple ProRes" << endl;
 	reportStream << " " << endl;
 
-	if(kinect.isConnected()) {
+/*	if(kinect.isConnected()) {
 		reportStream << "# Kinect" << endl;
 		reportStream << " Emitter: " << kinect.getSensorEmitterDistance() << "cm" << endl;
 		reportStream << " Camera:  " << kinect.getSensorCameraDistance() << "cm" << endl;
 		reportStream << " Z0 plane pixel size: " << kinect.getZeroPlanePixelSize() << "mm" << endl;
 		reportStream << " Z0 plane dist: " << kinect.getZeroPlaneDistance() << "mm" << endl;
-	}
+	}*/
 
 	reportStream << " " << endl;
 	reportStream << " " << endl;
