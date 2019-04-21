@@ -60,7 +60,7 @@ void ofApp::setup() {
 	ofSetFrameRate(60);
 
 
-	int playbackFrameRate = 30;
+	playbackFrameRate = 30;
 
 	frameTime = 1000000/playbackFrameRate;
 
@@ -75,6 +75,7 @@ void ofApp::setup() {
 	frameNumber = 0;
 	frameLoaded = 0;
 	frameNumberSent = 0;
+	playbackFrameNumber = 0;
 
 	for(int i = 0; i < totalWorkers; i++){
 		ofSaveWorker W[i];
@@ -214,45 +215,25 @@ void ofApp::drawPointCloud() {
 
 	if(bReplay) {
 
-		string fl = "";
-		string fp = "";
-
-		if (frameNumber == frameLoaded) {
-			int nextFrame = frameNumber + 1;
+		if (playbackFrameNumber == frameLoaded) {
+			int nextFrame = playbackFrameNumber + 1;
 			char fileName[20];
 			sprintf(fileName,"pc-%06d.ply", nextFrame);
 			string pointPath = fixPath + "/points/" + fileName;
 		    ofxBinaryMesh::load(pointPath, pointCloudPreLoaded);
 		    frameLoaded = nextFrame;
-			fl = "FrameLoaded";
-		    // ofLogNotice() << "FrameLoaded!";
 		} 
 
-		long enlapsedFrameTime = ofGetElapsedTimeMicros() - previousFrameTime;
-
-		long dynamicFrameTime = frameTime - frameCompensation;
-
-		ofLogNotice() << frameThing << '\t' << round(ofGetFrameRate()) / 30 << '\t' << ofGetFrameRate();
-
-
-		if(frameThing >= round(ofGetFrameRate()) / 30) {
-
+		if(frameThing >= round(ofGetFrameRate()) / playbackFrameRate) {
 			frameThing = 0;
 
-			previousEnlapsedFrameTime = enlapsedFrameTime;
-			previousFrameTime = ofGetElapsedTimeMicros();
 			if (!bReplayPause) {
-				frameNumber++;
+				if (playbackFrameNumber < totalPlaybackFrameNumber) {
+					playbackFrameNumber++;
+				}
 			}
 			pointCloud = pointCloudPreLoaded;
-			fp = "FramePlayed";
-		    // ofLogNotice() << "FramePlayed!";
-
 		}
-
-
-
-		ofLogNotice() << enlapsedFrameTime << '\t' << dynamicFrameTime << '\t' << previousEnlapsedFrameTime  << '\t' << fl << '\t' << fp;
 
 
 	} else {
@@ -417,9 +398,15 @@ void ofApp::loadTake(){
 	if (openFileResult.bSuccess){
 		ofLogVerbose("User selected a file");
 		fixPath = openFileResult.getPath();
+		
+		ofDirectory pointsDir;
+	   	pointsDir.open(fixPath + "/" + "points");
+	  
+	    totalPlaybackFrameNumber = pointsDir.listDir();
+
 		ofLogNotice() << fixPath;
 		bReplay = true;
-		frameNumber = 0;
+		playbackFrameNumber = 0;
 
 	} else {
 		ofLogVerbose("User hit cancel");
@@ -436,15 +423,17 @@ void ofApp::keyPressed (int key) {
 			break;
 		case 'x':
 			if(bReplayPause){
-				frameNumber = frameNumber + 30;
-				frameLoaded = frameNumber;
+				if (playbackFrameNumber + 30 <= totalPlaybackFrameNumber) {
+					playbackFrameNumber = playbackFrameNumber + 30;
+					frameLoaded = playbackFrameNumber;
+				}
 			}
 			break;
 		case 'z':
 			if(bReplayPause){
-				if (frameNumber > 30) {
-					frameNumber = frameNumber - 30;
-					frameLoaded = frameNumber;
+				if (playbackFrameNumber > 30) {
+					playbackFrameNumber = playbackFrameNumber - 30;
+					frameLoaded = playbackFrameNumber;
 				}
 			}
 			break;
@@ -488,6 +477,10 @@ void ofApp::keyPressed (int key) {
 		case 'n':
 			loadTake();
 			break;
+		case 'h':
+			playbackFrameNumber = 0;
+			frameLoaded = playbackFrameNumber;
+			break;
 		case 'g':
 			sMeshMode = 0;
 			panAngle = 0;
@@ -502,12 +495,11 @@ void ofApp::keyPressed (int key) {
 			panAngle -= 0.100f;
 			break;
 		case OF_KEY_UP:
-			frameCompensation += 50;
-			//tiltAngle += 1.500f;
+			tiltAngle += 1.500f;
 			break;
 		case OF_KEY_DOWN:
 			frameCompensation -= 50;
-			//tiltAngle -= 1.500f;
+			tiltAngle -= 1.500f;
 			break;
 		}
 }
@@ -557,9 +549,9 @@ void ofApp::drawInstructions() {
 	reportStream << "  FPS: " << round(ofGetFrameRate()) << endl;
 
 	if (bReplay) {
-		float playbackPerf = ((float) previousEnlapsedFrameTime / (float) frameTime);
-		reportStream << "  P: " << playbackPerf << endl;
-		if (playbackPerf > 1) {
+		float playbackPerf = (float) ofGetFrameRate() / playbackFrameRate;
+		reportStream << "  P: " << round (playbackPerf * 100) << " %"  << endl;
+		if (playbackPerf < 1) {
 			reportStream << "  Jitter!" << endl;
 		} else {
 			reportStream << "  " << endl;
@@ -567,12 +559,24 @@ void ofApp::drawInstructions() {
 	}
 
 	reportStream << " " << endl;
+
+	if (bReplay) {
 	
-	reportStream << "# Points" << endl;
-	reportStream << "  Total: " << frameNumberSent << endl;
-	reportStream << "  Pending: " << (frameNumberSent >= frameNumber ? frameNumberSent - frameNumber : 0 ) << endl;
-	reportStream << "  Saved: " << frameNumber << endl;
-	reportStream << " " << endl;
+		reportStream << "# Points Play" << endl;
+		reportStream << "  Frame: " << playbackFrameNumber << endl;
+		reportStream << "  Pending: " << totalPlaybackFrameNumber - playbackFrameNumber << endl;
+		reportStream << "  Total: " << totalPlaybackFrameNumber << endl;
+		reportStream << " " << endl;
+
+    } else {
+
+		reportStream << "# Points Rec" << endl;
+		reportStream << "  Total: " << frameNumberSent << endl;
+		reportStream << "  Pending: " << (frameNumberSent >= frameNumber ? frameNumberSent - frameNumber : 0 ) << endl;
+		reportStream << "  Saved: " << frameNumber << endl;
+		reportStream << " " << endl;
+
+    }
 	
 	reportStream << "# Video" << endl;
 	reportStream << "  Total: " << vidRecorder.getNumVideoFramesRecorded() << endl;

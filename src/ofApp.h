@@ -70,6 +70,8 @@ public:
 	int frameNumber;
 	int frameNumberSent;
 	int frameLoaded;
+	int playbackFrameNumber;
+	int totalPlaybackFrameNumber;
 
 	long lastSavedFrame;
 
@@ -107,7 +109,6 @@ public:
     string pointsDirPath;
     string takeName;
 
-
     long previousFrameTime;
     long previousSavedFrameTime;
     long previousFolderCheckTime;
@@ -119,7 +120,7 @@ public:
 
     int frameTime;
 
-    bool t;
+    int playbackFrameRate;
 
     int frameCompensation;
 
