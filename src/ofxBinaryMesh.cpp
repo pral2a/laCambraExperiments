@@ -60,33 +60,33 @@ namespace ofx
                 file.read((char *)(&(mesh.getVertices())[0]), sizeof(ofPoint) * numVerts);
             }
 
-            int numNormals = 0;
-            file.read((char *)(&numNormals), sizeof(int));
-            if (numNormals > 0) {
-                mesh.getNormals().resize(numNormals);
-                file.read((char *)(&(mesh.getNormals())[0]), sizeof(ofPoint) * numNormals);
-            }
+            // int numNormals = 0;
+            // file.read((char *)(&numNormals), sizeof(int));
+            // if (numNormals > 0) {
+            //     mesh.getNormals().resize(numNormals);
+            //     file.read((char *)(&(mesh.getNormals())[0]), sizeof(ofPoint) * numNormals);
+            // }
 
-            int numTexCoords = 0;
-            file.read((char *)(&numTexCoords), sizeof(int));
-            if (numTexCoords > 0) {
-                mesh.getTexCoords().resize(numTexCoords);
-                file.read((char *)(&(mesh.getTexCoords())[0]), sizeof(ofVec2f) * numTexCoords);
-            }
+            // int numTexCoords = 0;
+            // file.read((char *)(&numTexCoords), sizeof(int));
+            // if (numTexCoords > 0) {
+            //     mesh.getTexCoords().resize(numTexCoords);
+            //     file.read((char *)(&(mesh.getTexCoords())[0]), sizeof(ofVec2f) * numTexCoords);
+            // }
 
-            int numColors = 0;
-            file.read((char *)(&numColors), sizeof(int));
-            if (numColors > 0) {
-                mesh.getColors().resize(numColors);
-                file.read((char *)(&(mesh.getColors())[0]), sizeof(ofFloatColor) * numColors);
-            }
+            // int numColors = 0;
+            // file.read((char *)(&numColors), sizeof(int));
+            // if (numColors > 0) {
+            //     mesh.getColors().resize(numColors);
+            //     file.read((char *)(&(mesh.getColors())[0]), sizeof(ofFloatColor) * numColors);
+            // }
 
-            int numIndices = 0;
-            file.read((char *)(&numIndices), sizeof(int));
-            if (numIndices > 0) {
-                mesh.getIndices().resize(numIndices);
-                file.read((char *)(&(mesh.getIndices())[0]), sizeof(ofIndexType) * numIndices);
-            }
+            // int numIndices = 0;
+            // file.read((char *)(&numIndices), sizeof(int));
+            // if (numIndices > 0) {
+            //     mesh.getIndices().resize(numIndices);
+            //     file.read((char *)(&(mesh.getIndices())[0]), sizeof(ofIndexType) * numIndices);
+            // }
 
             file.close();
 

@@ -57,7 +57,7 @@ void ofApp::setup() {
 	bReplayPause = true;
 	bNewFrame = false;
 
-	ofSetFrameRate(60);
+	//ofSetFrameRate(60);
 
 
 	playbackFrameRate = 30;
@@ -101,6 +101,10 @@ void ofApp::setup() {
 	kinect.setLed(ofxKinect::LED_GREEN);
 
 	frameThing = 0;
+
+	easyCam.setAspectRatio(film.getWidth()/film.getHeight());
+	easyCam.disableOrtho();
+	easyCam.setFov(100);
 
 }
 
@@ -236,6 +240,40 @@ void ofApp::drawPointCloud() {
 		}
 
 
+
+	  	//for(int j=0; j<pointCloud.getNumVertices(); j++){
+
+
+	  		// float r = ofRandom(-0.1f,  0.1f);
+	    	// pointCloud.setVertex(j, pointCloud.getVertex(j) + ofVec3f(r,r,r));
+
+	    	// float r = ofRandom(-10,  10);
+	    	// pointCloud.setVertex(j, pointCloud.getVertex(j) + ofVec3f(r,0,0));
+
+
+	  	//}
+
+
+
+		//int q = 0;
+
+		//ofLogWarning() << pointCloud.getNumVertices();
+
+	  	// for(int j=0; j<pointCloud.getNumVertices(); j++){
+
+
+	  	// 	if (q < round(ofRandom(10, 20))) {
+	  	// 		q++;
+	  	// 		float r = 0;
+	   //  		pointCloud.setVertex(j, ofVec3f(r,r,r));
+	  	// 	} else {
+	  	// 		q = 0;
+	  	// 	}
+
+
+	  	// }
+
+
 	} else {
 
 		if (stepRes < 2) stepRes = 2;
@@ -271,11 +309,10 @@ void ofApp::drawPointCloud() {
 	} 
 
 	// Some fun!
-	//pointSize = ofRandom(pointSize -  0.1f,  pointSize + 0.1f);
+	// pointSize = ofRandom(pointSize -  0.1f,  pointSize + 0.1f);
 	glPointSize(pointSize);
 	ofPushMatrix();
-	ofRotateY(panAngle);
-	ofRotateX(tiltAngle);
+
 	// the projected points are 'upside down' and 'backwards'
 	ofScale(1, -1, -1);
 	ofTranslate(0, 0, -1000); // center the points a bit
@@ -483,23 +520,21 @@ void ofApp::keyPressed (int key) {
 			break;
 		case 'g':
 			sMeshMode = 0;
-			panAngle = 0;
-			tiltAngle = 0;
 			pointSize = 3.0;
 			stepRes = 2;
+			easyCam.reset();
 			break;
 		case OF_KEY_RIGHT:
-			panAngle += 0.100f;
+			easyCam.setPosition(easyCam.getX() + 0.100f, easyCam.getY(), easyCam.getZ());
 			break;
 		case OF_KEY_LEFT:
-			panAngle -= 0.100f;
+			easyCam.setPosition(easyCam.getX() - 0.100f, easyCam.getY(), easyCam.getZ());
 			break;
 		case OF_KEY_UP:
-			tiltAngle += 1.500f;
+			easyCam.setPosition(easyCam.getX(), easyCam.getY() + 0.100f, easyCam.getZ());
 			break;
 		case OF_KEY_DOWN:
-			frameCompensation -= 50;
-			tiltAngle -= 1.500f;
+			easyCam.setPosition(easyCam.getX(), easyCam.getY() - 0.100f, easyCam.getZ());
 			break;
 		}
 }
@@ -585,6 +620,15 @@ void ofApp::drawInstructions() {
 	reportStream << "  Mode: " << (bProxyMode?"proxy":"full") << endl;
 	reportStream << "  Resolution: " << film.getWidth() << "x" << film.getHeight() << endl;
 	reportStream << "  Codec: " << "Apple ProRes" << endl;
+	reportStream << " " << endl;
+
+	reportStream << "# Cam" << endl;
+	reportStream << "  Ratio: " << easyCam.getAspectRatio() << endl;
+	reportStream << "  Lens: " << easyCam.getFov() << endl;
+	reportStream << "  Zoom: " << easyCam.getDistance() << endl;
+	reportStream << "  X: " << easyCam.getX() << endl;
+	reportStream << "  Y: " << easyCam.getY() << endl;
+	reportStream << "  Z: " << easyCam.getZ() << endl;
 	reportStream << " " << endl;
 
 /*	if(kinect.isConnected()) {
