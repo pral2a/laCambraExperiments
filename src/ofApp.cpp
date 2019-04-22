@@ -20,7 +20,7 @@ void ofApp::setup() {
 	
 	if(!bProxyMode) {
 		// vidRecorder.setVideoCodec("prores");
-		film.allocate(2048, 1080, GL_RGBA);
+		film.allocate(1920, 1080, GL_RGBA);
 	} else {
 		// vidRecorder.setVideoCodec("prores");
 		film.allocate(1024, 600, GL_RGBA);
@@ -49,6 +49,7 @@ void ofApp::setup() {
 	bEncoding = false;
 	bWrittingPoints = false;
 	bPrevRealSize = false;
+	bProjectionOrtho = false;
 
 	bDrawVertices = true;
 	bDrawWireframe = false;
@@ -60,9 +61,7 @@ void ofApp::setup() {
 	//ofSetFrameRate(60);
 
 
-	playbackFrameRate = 30;
-
-	frameTime = 1000000/playbackFrameRate;
+	playbackFrameRate = defaultFrameRate;
 
 	// zero the tilt on startup
 	kinect.setCameraTiltAngle(0);
@@ -103,12 +102,20 @@ void ofApp::setup() {
 	frameThing = 0;
 
 	easyCam.setAspectRatio(film.getWidth()/film.getHeight());
-	easyCam.disableOrtho();
-	easyCam.setFov(100);
+
+	if (!bProjectionOrtho){
+		easyCam.disableOrtho();
+		easyCam.setFov(100);
+	}
+
+	easyCam.enableMouseMiddleButton();
 
 	bKontrol = true;
 
     nano.setup();
+
+    camSpeed = 0.1;
+
     
 
 }
@@ -116,15 +123,13 @@ void ofApp::setup() {
 //--------------------------------------------------------------
 void ofApp::update() {
 
-
-
 	if (bKontrol) {
 		easyCam.setDistance(ofMap(nano.getVal(K_SLIDER_3),0,127,0,1000));
-		easyCam.setPosition(ofMap(nano.getVal(K_SLIDER_4),0,127,-300,300), easyCam.getY(), easyCam.getZ());
-		easyCam.setPosition(easyCam.getX(), ofMap(nano.getVal(K_SLIDER_5),0,127,-300,300), easyCam.getZ());
-		easyCam.setFov(ofMap(nano.getVal(K_SLIDER_6),0,127, 28, 200));
-		pointSize = ofMap(nano.getVal(K_SLIDER_7),0,127,0,30);
 	}
+
+	easyCam.setFov(ofMap(nano.getVal(K_SLIDER_6),0,127, 28, 200));
+
+	pointSize = ofMap(nano.getVal(K_SLIDER_7),0,127,0,30);
 
 
 	// kinect.update();
@@ -244,6 +249,7 @@ void ofApp::drawPointCloud() {
 		    frameLoaded = nextFrame;
 		} 
 
+
 		if(frameThing >= round(ofGetFrameRate()) / playbackFrameRate) {
 			frameThing = 0;
 
@@ -256,18 +262,28 @@ void ofApp::drawPointCloud() {
 		}
 
 
-
-	  	//for(int j=0; j<pointCloud.getNumVertices(); j++){
-
-
-	  		// float r = ofRandom(-0.1f,  0.1f);
-	    	// pointCloud.setVertex(j, pointCloud.getVertex(j) + ofVec3f(r,r,r));
-
-	    	// float r = ofRandom(-10,  10);
-	    	// pointCloud.setVertex(j, pointCloud.getVertex(j) + ofVec3f(r,0,0));
+	   float rand = ofMap(nano.getVal(K_SLIDER_5),0,127,0,100);
+	   float t = ofMap(nano.getVal(K_SLIDER_4),0,127,0,2000);
 
 
-	  	//}
+	  	for(int j=0; j<pointCloud.getNumVertices(); j++){
+
+	  		//float r = ofRandom(-t,  t);
+
+	  		float r = ofRandom(-rand,  rand);
+
+	     	pointCloud.setVertex(j, pointCloud.getVertex(j) + ofVec3f(r,r,r));
+
+	  		if (t < 2000 && pointCloud.getVertex(j)[2] > t) {
+	  			pointCloud.setVertex(j, ofVec3f(0,0,0));
+	  		}
+
+	     	// pointCloud.setVertex(j, pointCloud.getVertex(j) + ofVec3f(r,r,r));
+
+	    	// float r = ofRandom(-100,  100);
+
+
+	  	}
 
 
 
@@ -396,7 +412,7 @@ void ofApp::startRecord() {
 				}
 				videoRecordingPath = takeDirPath + videoRecordingName;
 		    }
-			vidRecorder.setup(videoRecordingPath, film.getWidth(), film.getHeight(), 30);
+			vidRecorder.setup(videoRecordingPath, film.getWidth(), film.getHeight(), 25);
 			bRecording = true;
 			bEncoding = true;
 		}
@@ -528,6 +544,18 @@ void ofApp::keyPressed (int key) {
 			bKontrol = !bKontrol;
 			//stepRes--;
 			break;
+		case 'f':
+			playbackFrameRate = defaultFrameRate;
+			break;
+		case 'd':
+			bProjectionOrtho = !bProjectionOrtho;
+			if (bProjectionOrtho) {
+				easyCam.enableOrtho();
+			} else {
+				easyCam.disableOrtho();
+				easyCam.setFov(100);
+			}
+			break;
 		case 'n':
 			loadTake();
 			break;
@@ -543,16 +571,16 @@ void ofApp::keyPressed (int key) {
 			easyCam.setFov(100);
 			break;
 		case OF_KEY_RIGHT:
-			easyCam.setPosition(easyCam.getX() + 0.100f, easyCam.getY(), easyCam.getZ());
+			easyCam.setPosition(easyCam.getX() + camSpeed, easyCam.getY(), easyCam.getZ());
 			break;
 		case OF_KEY_LEFT:
-			easyCam.setPosition(easyCam.getX() - 0.100f, easyCam.getY(), easyCam.getZ());
+			easyCam.setPosition(easyCam.getX() - camSpeed, easyCam.getY(), easyCam.getZ());
 			break;
 		case OF_KEY_UP:
-			easyCam.setPosition(easyCam.getX(), easyCam.getY() + 0.100f, easyCam.getZ());
+			easyCam.setPosition(easyCam.getX(), easyCam.getY() + camSpeed, easyCam.getZ());
 			break;
 		case OF_KEY_DOWN:
-			easyCam.setPosition(easyCam.getX(), easyCam.getY() - 0.100f, easyCam.getZ());
+			easyCam.setPosition(easyCam.getX(), easyCam.getY() - camSpeed, easyCam.getZ());
 			break;
 		}
 }
@@ -616,6 +644,7 @@ void ofApp::drawInstructions() {
 	if (bReplay) {
 	
 		reportStream << "# Points Play" << endl;
+		reportStream << "  FPS: " << playbackFrameRate << endl;
 		reportStream << "  Frame: " << playbackFrameNumber << endl;
 		reportStream << "  Pending: " << totalPlaybackFrameNumber - playbackFrameNumber << endl;
 		reportStream << "  Total: " << totalPlaybackFrameNumber << endl;

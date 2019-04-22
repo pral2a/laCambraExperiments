@@ -116,6 +116,8 @@ public:
     long previousFolderCheckTime;
 	long previousEnlapsedFrameTime;
 
+	int defaultFrameRate = 30;
+
 	bool bNewFrame;
 
     bool bReplayPause;
@@ -131,5 +133,8 @@ public:
     ofxKorgNanoKontrol nano;
 
     bool bKontrol;
+    bool bProjectionOrtho;
+
+    float camSpeed;
 
 };

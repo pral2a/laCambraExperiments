@@ -41,7 +41,7 @@ void ofxKorgNanoKontrol::setup() {
     midiIn.addListener(this);
     
     // print received messages to the console
-    midiIn.setVerbose(true);
+    // midiIn.setVerbose(true);
     
     
     //cout << nanoKontrolAxisMapping[0] << endl;
