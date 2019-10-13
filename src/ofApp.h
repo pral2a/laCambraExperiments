@@ -106,6 +106,8 @@ public:
     long previousSavedFrameTime;
     long previousFolderCheckTime;
 
+    long framesTranscoded;
+
     int frameTime;
 
     ofPointsStorerPool pointsStorers;

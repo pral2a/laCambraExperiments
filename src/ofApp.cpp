@@ -17,7 +17,7 @@ void ofApp::setup() {
 		film.allocate(2048, 1080, GL_RGB);
 	} else {
 		vidRecorder.setVideoCodec("prores");
-		film.allocate(1024, 600, GL_RGB);
+		film.allocate(1920, 1080, GL_RGB);
 	}
 
 	ofAddListener(vidRecorder.outputFileCompleteEvent, this, &ofApp::recordingComplete);
@@ -61,7 +61,7 @@ void ofApp::setup() {
 	frameNumber = 0;
 	frameNumberSent = 0;
 
-	pointsStorers.start();
+	// pointsStorers.start();
     	
 	previousFrameTime = 0;
 	previousSavedFrameTime = 0;
@@ -87,7 +87,7 @@ void ofApp::update() {
 		recordFilm();
 	}
 
-	if(!bRecording && bWrittingPoints){
+/*	if(!bRecording && bWrittingPoints){
 		long now = ofGetElapsedTimeMillis();
 		if(now - previousFolderCheckTime >= 3000){
 			previousFolderCheckTime = ofGetElapsedTimeMillis();
@@ -102,7 +102,7 @@ void ofApp::update() {
 	    	}
 		}
 	
-	}
+	}*/
 
 
 
@@ -207,7 +207,7 @@ void ofApp::drawPointCloud() {
 		}
 
 
-		if(bRecording) {
+/*		if(bRecording) {
 			long now = ofGetElapsedTimeMillis();
 			if(now - previousFrameTime >= frameTime) {
 				previousFrameTime = ofGetElapsedTimeMillis();
@@ -220,7 +220,7 @@ void ofApp::drawPointCloud() {
 				pointsStorers.saveRaw(pointCloud);
 				frameNumberSent++;
 			}
-		} 
+		} */
 
 		if(!bEncoding && !bWrittingPoints) {
 			kinect.setLed(ofxKinect::LED_GREEN);
@@ -290,7 +290,7 @@ void ofApp::startRecord() {
 				videoRecordingName = ofGetTimestampString()+".mov";
 			}
 			string videoRecordingPath = takeDirPath + videoRecordingName;
-			vidRecorder.setup(videoRecordingPath, film.getWidth(), film.getHeight(), 30);
+			vidRecorder.setup(videoRecordingPath, film.getWidth(), film.getHeight(), 25);
 			bRecording = true;
 			bEncoding = true;
 		}
@@ -428,9 +428,12 @@ void ofApp::drawInstructions() {
 
 	stringstream reportStream;
 
+	framesTranscoded = vidRecorder.getNumVideoFramesRecorded() >= vidRecorder.getVideoQueueSize() ? vidRecorder.getNumVideoFramesRecorded() - vidRecorder.getVideoQueueSize(): 0;
+
 	reportStream << " " << endl;
 	if(!bRecording && (bEncoding || bWrittingPoints)) {
-		int p = round(((float) frameNumber / (float) frameNumberSent)*100);
+
+		int p = round(((float) framesTranscoded / (float) vidRecorder.getNumVideoFramesRecorded())*100);
 		reportStream << ">> Take: " << takeName << endl;
 		reportStream << "  Wait! " << p << "%" << " encoding complete" << endl;
 		reportStream << " " << endl;
@@ -457,16 +460,16 @@ void ofApp::drawInstructions() {
 	reportStream << "  FPS: " << round(ofGetFrameRate()) << endl;
 	reportStream << " " << endl;
 	
-	reportStream << "# Points" << endl;
-	reportStream << "  Total: " << frameNumberSent << endl;
-	reportStream << "  Pending: " << (frameNumberSent >= frameNumber ? frameNumberSent - frameNumber : 0 ) << endl;
-	reportStream << "  Saved: " << frameNumber << endl;
-	reportStream << " " << endl;
+	// reportStream << "# Points" << endl;
+	// reportStream << "  Total: " << frameNumberSent << endl;
+	// reportStream << "  Pending: " << (frameNumberSent >= frameNumber ? frameNumberSent - frameNumber : 0 ) << endl;
+	// reportStream << "  Saved: " << frameNumber << endl;
+	// reportStream << " " << endl;
 	
 	reportStream << "# Video" << endl;
 	reportStream << "  Total: " << vidRecorder.getNumVideoFramesRecorded() << endl;
 	reportStream << "  Pending: " << vidRecorder.getVideoQueueSize() << endl;
-	reportStream << "  Saved: " << (vidRecorder.getNumVideoFramesRecorded() >= vidRecorder.getVideoQueueSize() ? vidRecorder.getNumVideoFramesRecorded() - vidRecorder.getVideoQueueSize(): 0 ) << endl;
+	reportStream << "  Saved: " << framesTranscoded << endl;
 	reportStream << "  Mode: " << (bProxyMode?"proxy":"full") << endl;
 	reportStream << "  Resolution: " << film.getWidth() << "x" << film.getHeight() << endl;
 	reportStream << "  Codec: " << "Apple ProRes" << endl;
